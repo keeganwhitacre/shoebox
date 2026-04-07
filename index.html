@@ -2,7 +2,7 @@
 <html lang="en" data-theme="auto">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="shoebox">
@@ -56,7 +56,6 @@
 /* ---------- reset ---------- */
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html, body {
-  height: 100%;
   font-family: var(--font-sans);
   background: var(--bg);
   color: var(--text-primary);
@@ -65,10 +64,11 @@ html, body {
   overscroll-behavior: none;
   -webkit-font-smoothing: antialiased;
 }
+html { height: 100%; overflow: hidden; }
 body {
   display: flex;
   flex-direction: column;
-  height: 100dvh;
+  height: 100%;
   width: 100%;
   overflow: hidden;
 }
@@ -220,21 +220,15 @@ button { cursor: pointer; }
 /* ---------- overlay views (entry, settings) ---------- */
 .overlay {
   position: fixed;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 100vh;
-  height: 100dvh;
+  inset: 0;
   background: var(--bg);
   display: flex;
   flex-direction: column;
   z-index: 100;
   transform: translateY(100%);
   transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
-  will-change: transform, height;
 }
 .overlay.is-open { transform: translateY(0); }
-.overlay.is-keyboard-open { transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1), height 0.2s ease-out; }
 
 .overlay-header {
   display: flex;
@@ -260,10 +254,14 @@ button { cursor: pointer; }
 .overlay-body {
   flex: 1;
   padding: 32px 28px 28px;
-  overflow: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   display: flex;
   flex-direction: column;
   min-height: 0;
+}
+.overlay-body.is-compose {
+  overflow: hidden;
 }
 
 /* compose */
@@ -317,8 +315,6 @@ button { cursor: pointer; }
   font-family: var(--font-sans);
   caret-color: var(--text-primary);
   padding: 0;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
 }
 
 /* popover menu */
@@ -570,7 +566,7 @@ body.lowercase-mode .read-textarea::first-letter {
     </span>
     <span class="overlay-action" id="compose-done">done</span>
   </div>
-  <div class="overlay-body">
+  <div class="overlay-body is-compose">
     <textarea class="compose-textarea" id="compose-input" autocomplete="off" autocorrect="on" autocapitalize="none" spellcheck="false" enterkeyhint="enter"></textarea>
   </div>
 </div>
@@ -1391,31 +1387,6 @@ document.getElementById("create-gist-btn").addEventListener("click", async () =>
     flashButton("create-gist-btn", "failed");
   }
 });
-
-/* ---------- visual viewport / keyboard handling ----------
-   when the keyboard appears on iOS, the layout viewport stays the same
-   but the visual viewport shrinks. we listen for that and resize any
-   open overlay to match, so the textarea fits above the keyboard. */
-function handleViewportResize() {
-  if (!window.visualViewport) return;
-  const vh = window.visualViewport.height;
-  const fullVh = window.innerHeight;
-  const keyboardOpen = vh < fullVh - 50; // 50px threshold for noise
-
-  document.querySelectorAll(".overlay.is-open").forEach(o => {
-    if (keyboardOpen) {
-      o.style.height = vh + "px";
-      o.classList.add("is-keyboard-open");
-    } else {
-      o.style.height = "";
-      o.classList.remove("is-keyboard-open");
-    }
-  });
-}
-if (window.visualViewport) {
-  window.visualViewport.addEventListener("resize", handleViewportResize);
-  window.visualViewport.addEventListener("scroll", handleViewportResize);
-}
 
 /* ---------- service worker (offline support) ---------- */
 if ("serviceWorker" in navigator) {
