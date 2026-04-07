@@ -161,7 +161,8 @@ button { cursor: pointer; }
   font-size: 19px;
   line-height: 1.55;
   color: var(--text-primary);
-  font-weight: 450;
+  font-weight: 500;
+  -webkit-text-stroke: 0.2px currentColor;
   word-wrap: break-word;
   white-space: pre-wrap;
 }
@@ -222,6 +223,7 @@ button { cursor: pointer; }
   left: 0;
   right: 0;
   top: 0;
+  height: 100vh;
   height: 100dvh;
   background: var(--bg);
   display: flex;
@@ -229,8 +231,10 @@ button { cursor: pointer; }
   z-index: 100;
   transform: translateY(100%);
   transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+  will-change: transform, height;
 }
 .overlay.is-open { transform: translateY(0); }
+.overlay.is-keyboard-open { transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1), height 0.2s ease-out; }
 
 .overlay-header {
   display: flex;
@@ -256,9 +260,10 @@ button { cursor: pointer; }
 .overlay-body {
   flex: 1;
   padding: 32px 28px 28px;
-  overflow-y: auto;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
+  min-height: 0;
 }
 
 /* compose */
@@ -268,12 +273,16 @@ button { cursor: pointer; }
   font-size: 19px;
   line-height: 1.6;
   color: var(--text-primary);
-  font-weight: 450;
+  font-weight: 500;
+  -webkit-text-stroke: 0.2px currentColor;
   resize: none;
   border: none;
   background: transparent;
   font-family: var(--font-sans);
   caret-color: var(--text-primary);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  min-height: 0;
 }
 .compose-textarea::placeholder { color: var(--text-tertiary); }
 
@@ -288,7 +297,8 @@ button { cursor: pointer; }
   font-size: 20px;
   line-height: 1.6;
   color: var(--text-primary);
-  font-weight: 450;
+  font-weight: 500;
+  -webkit-text-stroke: 0.2px currentColor;
   word-wrap: break-word;
   white-space: pre-wrap;
   cursor: text;
@@ -297,7 +307,8 @@ button { cursor: pointer; }
   font-size: 20px;
   line-height: 1.6;
   color: var(--text-primary);
-  font-weight: 450;
+  font-weight: 500;
+  -webkit-text-stroke: 0.2px currentColor;
   width: 100%;
   flex: 1;
   resize: none;
@@ -306,6 +317,8 @@ button { cursor: pointer; }
   font-family: var(--font-sans);
   caret-color: var(--text-primary);
   padding: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* popover menu */
@@ -472,6 +485,54 @@ button { cursor: pointer; }
   color: var(--text-primary);
 }
 
+/* toggle switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 24px;
+}
+.switch input { display: none; }
+.switch-slider {
+  position: absolute;
+  inset: 0;
+  background: var(--surface);
+  border-radius: 24px;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+.switch-slider::before {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  left: 3px;
+  top: 3px;
+  background: var(--bg);
+  border: 0.5px solid var(--border-strong);
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+.switch input:checked + .switch-slider {
+  background: var(--text-primary);
+}
+.switch input:checked + .switch-slider::before {
+  transform: translateX(16px);
+  border-color: var(--text-primary);
+}
+
+/* lowercase mode — applies text-transform without altering stored data */
+body.lowercase-mode .entry-text,
+body.lowercase-mode .read-text,
+body.lowercase-mode .read-textarea,
+body.lowercase-mode .compose-textarea {
+  text-transform: lowercase;
+}
+body.lowercase-mode .compose-textarea::first-letter,
+body.lowercase-mode .read-textarea::first-letter {
+  text-transform: lowercase;
+}
+
 /* hidden file input */
 .hidden-file { display: none; }
 </style>
@@ -510,7 +571,7 @@ button { cursor: pointer; }
     <span class="overlay-action" id="compose-done">done</span>
   </div>
   <div class="overlay-body">
-    <textarea class="compose-textarea" id="compose-input" autocomplete="off" autocorrect="on" spellcheck="false" enterkeyhint="enter"></textarea>
+    <textarea class="compose-textarea" id="compose-input" autocomplete="off" autocorrect="on" autocapitalize="none" spellcheck="false" enterkeyhint="enter"></textarea>
   </div>
 </div>
 
@@ -550,6 +611,13 @@ button { cursor: pointer; }
           <span class="theme-option" data-theme-value="dark">dark</span>
           <span class="theme-option" data-theme-value="auto">auto</span>
         </div>
+      </div>
+      <div class="settings-row" style="margin-top: 14px;">
+        <span class="settings-row-label">lowercase</span>
+        <label class="switch">
+          <input type="checkbox" id="lowercase-toggle">
+          <span class="switch-slider"></span>
+        </label>
       </div>
     </div>
 
@@ -902,9 +970,10 @@ function closeRead() {
 function enterEditMode() {
   const entry = state.entries.find(e => e.id === state.currentReadId);
   if (!entry) return;
+  const lowercase = document.body.classList.contains("lowercase-mode") ? 'autocapitalize="none"' : '';
   readBody.innerHTML =
     '<p class="read-date">' + escapeHtml(formatDate(entry.created_at)) + '</p>' +
-    '<textarea class="read-textarea" id="read-edit">' + escapeHtml(entry.text) + '</textarea>';
+    '<textarea class="read-textarea" id="read-edit" ' + lowercase + ' enterkeyhint="enter">' + escapeHtml(entry.text) + '</textarea>';
   const ta = document.getElementById("read-edit");
   ta.focus();
   // place cursor at end
@@ -1034,6 +1103,23 @@ function setActiveTheme(theme) {
 }
 document.querySelectorAll(".theme-option").forEach(opt => {
   opt.addEventListener("click", () => setActiveTheme(opt.dataset.themeValue));
+});
+
+/* lowercase mode */
+function setLowercaseMode(enabled) {
+  document.body.classList.toggle("lowercase-mode", enabled);
+  const composeInput = document.getElementById("compose-input");
+  if (composeInput) {
+    composeInput.setAttribute("autocapitalize", enabled ? "none" : "sentences");
+  }
+  const toggle = document.getElementById("lowercase-toggle");
+  if (toggle) toggle.checked = enabled;
+  const s = loadSettings();
+  s.lowercase = enabled;
+  saveSettings(s);
+}
+document.getElementById("lowercase-toggle").addEventListener("change", (e) => {
+  setLowercaseMode(e.target.checked);
 });
 
 /* archive stats */
@@ -1306,6 +1392,31 @@ document.getElementById("create-gist-btn").addEventListener("click", async () =>
   }
 });
 
+/* ---------- visual viewport / keyboard handling ----------
+   when the keyboard appears on iOS, the layout viewport stays the same
+   but the visual viewport shrinks. we listen for that and resize any
+   open overlay to match, so the textarea fits above the keyboard. */
+function handleViewportResize() {
+  if (!window.visualViewport) return;
+  const vh = window.visualViewport.height;
+  const fullVh = window.innerHeight;
+  const keyboardOpen = vh < fullVh - 50; // 50px threshold for noise
+
+  document.querySelectorAll(".overlay.is-open").forEach(o => {
+    if (keyboardOpen) {
+      o.style.height = vh + "px";
+      o.classList.add("is-keyboard-open");
+    } else {
+      o.style.height = "";
+      o.classList.remove("is-keyboard-open");
+    }
+  });
+}
+if (window.visualViewport) {
+  window.visualViewport.addEventListener("resize", handleViewportResize);
+  window.visualViewport.addEventListener("scroll", handleViewportResize);
+}
+
 /* ---------- service worker (offline support) ---------- */
 if ("serviceWorker" in navigator) {
   // inline service worker via blob URL — keeps everything in one file
@@ -1338,6 +1449,8 @@ async function init() {
   // theme
   const s = loadSettings();
   setActiveTheme(s.theme || "auto");
+  // lowercase mode (default on)
+  setLowercaseMode(s.lowercase !== false);
 
   // load entries
   try {
