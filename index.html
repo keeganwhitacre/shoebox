@@ -273,15 +273,16 @@ button { cursor: pointer; }
   color: var(--text-primary);
   font-weight: 500;
   -webkit-text-stroke: 0.2px currentColor;
+  resize: none;
+  border: none;
+  background: transparent;
   font-family: var(--font-sans);
   caret-color: var(--text-primary);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   min-height: 0;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  cursor: text;
 }
+.compose-textarea::placeholder { color: var(--text-tertiary); }
 
 /* read */
 .read-date {
@@ -308,14 +309,12 @@ button { cursor: pointer; }
   -webkit-text-stroke: 0.2px currentColor;
   width: 100%;
   flex: 1;
+  resize: none;
+  border: none;
+  background: transparent;
   font-family: var(--font-sans);
   caret-color: var(--text-primary);
   padding: 0;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  cursor: text;
 }
 
 /* popover menu */
@@ -564,8 +563,7 @@ body.lowercase-mode .compose-textarea {
     <span class="overlay-action" id="compose-done">done</span>
   </div>
   <div class="overlay-body is-compose">
-    <!-- Replaced textarea with contenteditable div for iOS native keyboard (no accessory bar) -->
-    <div class="compose-textarea" id="compose-input" contenteditable="true" autocomplete="off" autocorrect="on" autocapitalize="none" spellcheck="false" enterkeyhint="enter"></div>
+    <textarea class="compose-textarea" id="compose-input" autocomplete="off" autocorrect="on" autocapitalize="none" spellcheck="false" enterkeyhint="enter"></textarea>
   </div>
 </div>
 
@@ -879,19 +877,6 @@ function escapeHtml(s) {
     .replace(/'/g, "&#039;");
 }
 
-// Utility to move cursor to the end of a contenteditable div
-function placeCaretAtEnd(el) {
-  el.focus({ preventScroll: true });
-  if (typeof window.getSelection !== "undefined" && typeof document.createRange !== "undefined") {
-    const range = document.createRange();
-    range.selectNodeContents(el);
-    range.collapse(false); // false means to the end
-    const sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
-  }
-}
-
 /* ---------- focus fade on scroll ---------- */
 function updateFocus() {
   const items = scrollEl.querySelectorAll(".snap-item");
@@ -916,7 +901,7 @@ const composeInput = document.getElementById("compose-input");
 
 function openCompose() {
   state.composeMode = "new";
-  composeInput.innerText = "";
+  composeInput.value = "";
   // focus synchronously with preventScroll to stop iOS from jumping layout
   composeInput.focus({ preventScroll: true });
   composeOverlay.classList.add("is-open");
@@ -928,7 +913,7 @@ function closeCompose() {
 }
 
 async function saveCompose() {
-  const text = composeInput.innerText.trim();
+  const text = composeInput.value.trim();
   if (!text) {
     closeCompose();
     return;
@@ -978,15 +963,13 @@ function enterEditMode() {
   if (!entry) return;
   const lowercase = document.body.classList.contains("lowercase-mode") ? 'autocapitalize="none"' : '';
   
-  // Replace textarea with a contenteditable div
   readBody.innerHTML =
     '<p class="read-date">' + escapeHtml(formatDate(entry.created_at)) + '</p>' +
-    '<div class="read-textarea" id="read-edit" contenteditable="true" ' + lowercase + ' enterkeyhint="enter"></div>';
+    '<textarea class="read-textarea" id="read-edit" ' + lowercase + ' enterkeyhint="enter">' + escapeHtml(entry.text) + '</textarea>';
   
   const ta = document.getElementById("read-edit");
-  // using innerText safely parses \n to visual breaks without HTML injection
-  ta.innerText = entry.text; 
-  placeCaretAtEnd(ta); // Focuses with preventScroll & moves cursor to the end
+  ta.focus({ preventScroll: true });
+  ta.setSelectionRange(ta.value.length, ta.value.length);
 }
 
 async function saveReadEdit() {
@@ -994,7 +977,7 @@ async function saveReadEdit() {
   if (!ta) return;
   const entry = state.entries.find(e => e.id === state.currentReadId);
   if (!entry) return;
-  const newText = ta.innerText.trim();
+  const newText = ta.value.trim();
   if (!newText) {
     // empty edit = delete
     await deleteCurrentEntry();
