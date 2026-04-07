@@ -1,4 +1,7 @@
 # shoebox
+
+[[github header.png]]
+
 A minimalist, local-first memory archive designed for savoring.
 
 **shoebox** is a single-file Progressive Web App (PWA) built to capture positive micro-interactions and small moments. It inverts the standard journaling model: the archive itself is the product, and the writing is just the excuse to add to it.
