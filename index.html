@@ -72,7 +72,7 @@ body {
   width: 100%;
   overflow: hidden;
 }
-button, input, textarea {
+button, input, textarea, [contenteditable] {
   font: inherit;
   color: inherit;
   background: transparent;
@@ -273,16 +273,15 @@ button { cursor: pointer; }
   color: var(--text-primary);
   font-weight: 500;
   -webkit-text-stroke: 0.2px currentColor;
-  resize: none;
-  border: none;
-  background: transparent;
   font-family: var(--font-sans);
   caret-color: var(--text-primary);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   min-height: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  cursor: text;
 }
-.compose-textarea::placeholder { color: var(--text-tertiary); }
 
 /* read */
 .read-date {
@@ -309,12 +308,14 @@ button { cursor: pointer; }
   -webkit-text-stroke: 0.2px currentColor;
   width: 100%;
   flex: 1;
-  resize: none;
-  border: none;
-  background: transparent;
   font-family: var(--font-sans);
   caret-color: var(--text-primary);
   padding: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  cursor: text;
 }
 
 /* popover menu */
@@ -524,10 +525,6 @@ body.lowercase-mode .read-textarea,
 body.lowercase-mode .compose-textarea {
   text-transform: lowercase;
 }
-body.lowercase-mode .compose-textarea::first-letter,
-body.lowercase-mode .read-textarea::first-letter {
-  text-transform: lowercase;
-}
 
 /* hidden file input */
 .hidden-file { display: none; }
@@ -567,7 +564,8 @@ body.lowercase-mode .read-textarea::first-letter {
     <span class="overlay-action" id="compose-done">done</span>
   </div>
   <div class="overlay-body is-compose">
-    <textarea class="compose-textarea" id="compose-input" autocomplete="off" autocorrect="on" autocapitalize="none" spellcheck="false" enterkeyhint="enter"></textarea>
+    <!-- Replaced textarea with contenteditable div for iOS native keyboard (no accessory bar) -->
+    <div class="compose-textarea" id="compose-input" contenteditable="true" autocomplete="off" autocorrect="on" autocapitalize="none" spellcheck="false" enterkeyhint="enter"></div>
   </div>
 </div>
 
@@ -881,6 +879,19 @@ function escapeHtml(s) {
     .replace(/'/g, "&#039;");
 }
 
+// Utility to move cursor to the end of a contenteditable div
+function placeCaretAtEnd(el) {
+  el.focus({ preventScroll: true });
+  if (typeof window.getSelection !== "undefined" && typeof document.createRange !== "undefined") {
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    range.collapse(false); // false means to the end
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+}
+
 /* ---------- focus fade on scroll ---------- */
 function updateFocus() {
   const items = scrollEl.querySelectorAll(".snap-item");
@@ -905,10 +916,9 @@ const composeInput = document.getElementById("compose-input");
 
 function openCompose() {
   state.composeMode = "new";
-  composeInput.value = "";
-  // focus synchronously BEFORE the animation so iOS treats it as a user gesture
-  // and opens the keyboard. the slide-up animation plays around it.
-  composeInput.focus();
+  composeInput.innerText = "";
+  // focus synchronously with preventScroll to stop iOS from jumping layout
+  composeInput.focus({ preventScroll: true });
   composeOverlay.classList.add("is-open");
 }
 
@@ -918,7 +928,7 @@ function closeCompose() {
 }
 
 async function saveCompose() {
-  const text = composeInput.value.trim();
+  const text = composeInput.innerText.trim();
   if (!text) {
     closeCompose();
     return;
@@ -967,13 +977,16 @@ function enterEditMode() {
   const entry = state.entries.find(e => e.id === state.currentReadId);
   if (!entry) return;
   const lowercase = document.body.classList.contains("lowercase-mode") ? 'autocapitalize="none"' : '';
+  
+  // Replace textarea with a contenteditable div
   readBody.innerHTML =
     '<p class="read-date">' + escapeHtml(formatDate(entry.created_at)) + '</p>' +
-    '<textarea class="read-textarea" id="read-edit" ' + lowercase + ' enterkeyhint="enter">' + escapeHtml(entry.text) + '</textarea>';
+    '<div class="read-textarea" id="read-edit" contenteditable="true" ' + lowercase + ' enterkeyhint="enter"></div>';
+  
   const ta = document.getElementById("read-edit");
-  ta.focus();
-  // place cursor at end
-  ta.setSelectionRange(ta.value.length, ta.value.length);
+  // using innerText safely parses \n to visual breaks without HTML injection
+  ta.innerText = entry.text; 
+  placeCaretAtEnd(ta); // Focuses with preventScroll & moves cursor to the end
 }
 
 async function saveReadEdit() {
@@ -981,7 +994,7 @@ async function saveReadEdit() {
   if (!ta) return;
   const entry = state.entries.find(e => e.id === state.currentReadId);
   if (!entry) return;
-  const newText = ta.value.trim();
+  const newText = ta.innerText.trim();
   if (!newText) {
     // empty edit = delete
     await deleteCurrentEntry();
