@@ -2,7 +2,7 @@
 <html lang="en" data-theme="auto">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="shoebox">
@@ -68,9 +68,7 @@ html, body {
 body {
   display: flex;
   flex-direction: column;
-  height: 100vh;
   height: 100dvh;
-  position: fixed;
   width: 100%;
   overflow: hidden;
 }
@@ -163,7 +161,7 @@ button { cursor: pointer; }
   font-size: 19px;
   line-height: 1.55;
   color: var(--text-primary);
-  font-weight: 400;
+  font-weight: 450;
   word-wrap: break-word;
   white-space: pre-wrap;
 }
@@ -221,7 +219,10 @@ button { cursor: pointer; }
 /* ---------- overlay views (entry, settings) ---------- */
 .overlay {
   position: fixed;
-  inset: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 100dvh;
   background: var(--bg);
   display: flex;
   flex-direction: column;
@@ -239,11 +240,17 @@ button { cursor: pointer; }
   flex-shrink: 0;
 }
 .overlay-action {
-  font-size: 15px;
-  color: var(--text-tertiary);
+  font-size: 16px;
+  color: var(--text-secondary);
   letter-spacing: 0.02em;
   cursor: pointer;
-  padding: 8px 4px;
+  padding: 12px 16px;
+  margin: -8px -12px;
+  font-weight: 500;
+}
+.overlay-action.is-icon {
+  color: var(--text-tertiary);
+  font-weight: 400;
 }
 
 .overlay-body {
@@ -261,6 +268,7 @@ button { cursor: pointer; }
   font-size: 19px;
   line-height: 1.6;
   color: var(--text-primary);
+  font-weight: 450;
   resize: none;
   border: none;
   background: transparent;
@@ -280,6 +288,7 @@ button { cursor: pointer; }
   font-size: 20px;
   line-height: 1.6;
   color: var(--text-primary);
+  font-weight: 450;
   word-wrap: break-word;
   white-space: pre-wrap;
   cursor: text;
@@ -288,6 +297,7 @@ button { cursor: pointer; }
   font-size: 20px;
   line-height: 1.6;
   color: var(--text-primary);
+  font-weight: 450;
   width: 100%;
   flex: 1;
   resize: none;
@@ -494,23 +504,23 @@ button { cursor: pointer; }
 <!-- compose / new entry overlay -->
 <div class="overlay" id="compose-overlay">
   <div class="overlay-header">
-    <span class="overlay-action" id="compose-cancel">
+    <span class="overlay-action is-icon" id="compose-cancel">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
     </span>
     <span class="overlay-action" id="compose-done">done</span>
   </div>
   <div class="overlay-body">
-    <textarea class="compose-textarea" id="compose-input" autocomplete="off" autocorrect="on" spellcheck="false"></textarea>
+    <textarea class="compose-textarea" id="compose-input" autocomplete="off" autocorrect="on" spellcheck="false" enterkeyhint="enter"></textarea>
   </div>
 </div>
 
 <!-- read / view entry overlay -->
 <div class="overlay" id="read-overlay">
   <div class="overlay-header">
-    <span class="overlay-action" id="read-close">
+    <span class="overlay-action is-icon" id="read-close">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
     </span>
-    <span class="overlay-action" id="read-menu-btn">
+    <span class="overlay-action is-icon" id="read-menu-btn">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>
     </span>
   </div>
@@ -524,10 +534,10 @@ button { cursor: pointer; }
 <!-- settings overlay -->
 <div class="overlay" id="settings-overlay">
   <div class="overlay-header">
-    <span class="overlay-action" id="settings-close">
+    <span class="overlay-action is-icon" id="settings-close">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
     </span>
-    <span class="overlay-action">settings</span>
+    <span class="overlay-action is-icon">settings</span>
   </div>
   <div class="overlay-body">
 
