@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="shoebox">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<title>shoebox</title>
+<link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogInNob2Vib3giLAogICJzaG9ydF9uYW1lIjogInNob2Vib3giLAogICJzdGFydF91cmwiOiAiLiIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgIm9yaWVudGF0aW9uIjogInBvcnRyYWl0IiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjZmZmZmZmIiwKICAidGhlbWVfY29sb3IiOiAiI2ZmZmZmZiIsCiAgImljb25zIjogW10KfQ==">
+<style>
+/* ---------- theme ---------- */
+:root {
+  --bg: #ffffff;
+  --text-primary: #1a1a1a;
+  --text-secondary: #6b6b6b;
+  --text-tertiary: #a0a0a0;
+  --border: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.15);
+  --surface: #f5f5f3;
+  --fab-bg: #1a1a1a;
+  --fab-fg: #ffffff;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-serif: "Iowan Old Style", "Palatino", "Palatino Linotype", Georgia, serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace;
+}
+
+[data-theme="dark"] {
+  --bg: #0a0a0a;
+  --text-primary: #f0f0f0;
+  --text-secondary: #8a8a8a;
+  --text-tertiary: #5a5a5a;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.15);
+  --surface: #1a1a1a;
+  --fab-bg: #f0f0f0;
+  --fab-fg: #0a0a0a;
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-theme="auto"] {
+    --bg: #0a0a0a;
+    --text-primary: #f0f0f0;
+    --text-secondary: #8a8a8a;
+    --text-tertiary: #5a5a5a;
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.15);
+    --surface: #1a1a1a;
+    --fab-bg: #f0f0f0;
+    --fab-fg: #0a0a0a;
+  }
+}
+
+/* ---------- reset ---------- */
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body {
+  height: 100%;
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text-primary);
+  font-size: 16px;
+  line-height: 1.65;
+  overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  position: fixed;
+  width: 100%;
+  overflow: hidden;
+}
+button, input, textarea {
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: none;
+  outline: none;
+}
+button { cursor: pointer; }
+
+/* ---------- main scroll view ---------- */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+  background: var(--bg);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: max(env(safe-area-inset-top, 0px), 14px) 24px 16px;
+  background: var(--bg);
+  position: relative;
+  z-index: 10;
+  flex-shrink: 0;
+}
+.header-left, .header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.header-label {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  padding: 4px 0;
+}
+.icon-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  cursor: pointer;
+}
+.icon-btn svg { width: 16px; height: 16px; }
+
+.scroll-wrap {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+}
+.scroll {
+  height: 100%;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 0 24px;
+  -webkit-overflow-scrolling: touch;
+}
+.scroll::-webkit-scrollbar { display: none; }
+
+.snap-item {
+  scroll-snap-align: center;
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 24px 0;
+  cursor: pointer;
+  transition: opacity 0.2s ease-out;
+}
+.snap-item.is-prompt { cursor: default; }
+
+.entry-date {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-bottom: 10px;
+  letter-spacing: 0.02em;
+}
+.entry-text {
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--text-primary);
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.prompt-text {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.empty-state {
+  font-size: 14px;
+  color: var(--text-tertiary);
+  text-align: center;
+  font-style: italic;
+}
+
+.fade-top, .fade-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+.fade-top {
+  top: 0;
+  height: 32px;
+  background: linear-gradient(to bottom, var(--bg), transparent);
+}
+.fade-bottom {
+  bottom: 0;
+  height: 80px;
+  background: linear-gradient(to top, var(--bg), transparent);
+}
+
+.fab {
+  position: absolute;
+  bottom: max(env(safe-area-inset-bottom, 0px), 24px);
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--fab-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  transition: transform 0.1s;
+}
+.fab:active { transform: scale(0.94); }
+.fab svg { width: 22px; height: 22px; stroke: var(--fab-fg); }
+
+/* ---------- overlay views (entry, settings) ---------- */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  transform: translateY(100%);
+  transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.overlay.is-open { transform: translateY(0); }
+
+.overlay-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: max(env(safe-area-inset-top, 0px), 14px) 24px 16px;
+  flex-shrink: 0;
+}
+.overlay-action {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  padding: 6px 4px;
+}
+
+.overlay-body {
+  flex: 1;
+  padding: 24px 28px 28px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* compose */
+.compose-textarea {
+  flex: 1;
+  width: 100%;
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--text-primary);
+  resize: none;
+  border: none;
+  background: transparent;
+  font-family: var(--font-sans);
+  caret-color: var(--text-primary);
+}
+.compose-textarea::placeholder { color: var(--text-tertiary); }
+
+/* read */
+.read-date {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-bottom: 18px;
+  letter-spacing: 0.02em;
+}
+.read-text {
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--text-primary);
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  cursor: text;
+}
+.read-textarea {
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--text-primary);
+  width: 100%;
+  flex: 1;
+  resize: none;
+  border: none;
+  background: transparent;
+  font-family: var(--font-sans);
+  caret-color: var(--text-primary);
+  padding: 0;
+}
+
+/* popover menu */
+.menu {
+  position: absolute;
+  top: 56px;
+  right: 20px;
+  background: var(--bg);
+  border: 0.5px solid var(--border-strong);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  padding: 6px 0;
+  min-width: 140px;
+  z-index: 200;
+  display: none;
+}
+.menu.is-open { display: block; }
+.menu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 16px;
+  font-size: 14px;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+.menu-item.danger { color: #c0392b; }
+[data-theme="dark"] .menu-item.danger { color: #e57373; }
+@media (prefers-color-scheme: dark) {
+  [data-theme="auto"] .menu-item.danger { color: #e57373; }
+}
+
+.confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 300;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.confirm-backdrop.is-open { display: flex; }
+.confirm {
+  background: var(--bg);
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 280px;
+  width: 100%;
+  text-align: center;
+}
+.confirm-text {
+  font-size: 15px;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+.confirm-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+.confirm-btn {
+  padding: 8px 20px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  border: 0.5px solid var(--border-strong);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.confirm-btn.primary {
+  color: #c0392b;
+  border-color: #c0392b;
+}
+[data-theme="dark"] .confirm-btn.primary { color: #e57373; border-color: #e57373; }
+@media (prefers-color-scheme: dark) {
+  [data-theme="auto"] .confirm-btn.primary { color: #e57373; border-color: #e57373; }
+}
+
+/* settings */
+.settings-section {
+  margin-bottom: 36px;
+}
+.settings-label {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-bottom: 12px;
+  letter-spacing: 0.04em;
+}
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+}
+.settings-row-label {
+  font-size: 15px;
+  color: var(--text-primary);
+}
+.settings-field {
+  margin-bottom: 18px;
+}
+.settings-field-label {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-bottom: 6px;
+}
+.settings-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 0.5px solid var(--border-strong);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--text-primary);
+  background: transparent;
+  font-family: var(--font-mono);
+}
+.settings-button {
+  font-size: 13px;
+  color: var(--text-primary);
+  padding: 6px 12px;
+  border: 0.5px solid var(--border-strong);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.settings-button-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+.settings-data-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  cursor: pointer;
+}
+.settings-data-label {
+  font-size: 14px;
+  color: var(--text-primary);
+}
+.settings-meta {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.theme-toggle {
+  display: flex;
+  gap: 2px;
+  background: var(--surface);
+  padding: 3px;
+  border-radius: 8px;
+}
+.theme-option {
+  font-size: 12px;
+  padding: 5px 11px;
+  border-radius: 5px;
+  color: var(--text-tertiary);
+  cursor: pointer;
+}
+.theme-option.is-active {
+  background: var(--bg);
+  color: var(--text-primary);
+}
+
+/* hidden file input */
+.hidden-file { display: none; }
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+  <div class="header">
+    <div class="header-left">
+      <span class="header-label" id="settings-trigger">shoebox</span>
+    </div>
+    <div class="header-right">
+      <button class="icon-btn" id="shuffle-btn" aria-label="shuffle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="scroll-wrap">
+    <div class="scroll" id="scroll"></div>
+    <div class="fade-top"></div>
+    <div class="fade-bottom"></div>
+  </div>
+
+  <button class="fab" id="add-btn" aria-label="add memory">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+  </button>
+</div>
+
+<!-- compose / new entry overlay -->
+<div class="overlay" id="compose-overlay">
+  <div class="overlay-header">
+    <span class="overlay-action" id="compose-cancel">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </span>
+    <span class="overlay-action" id="compose-done">done</span>
+  </div>
+  <div class="overlay-body">
+    <textarea class="compose-textarea" id="compose-input" autocomplete="off" autocorrect="on" spellcheck="false"></textarea>
+  </div>
+</div>
+
+<!-- read / view entry overlay -->
+<div class="overlay" id="read-overlay">
+  <div class="overlay-header">
+    <span class="overlay-action" id="read-close">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </span>
+    <span class="overlay-action" id="read-menu-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>
+    </span>
+  </div>
+  <div class="menu" id="read-menu">
+    <button class="menu-item" id="menu-edit">edit</button>
+    <button class="menu-item danger" id="menu-delete">delete</button>
+  </div>
+  <div class="overlay-body" id="read-body"></div>
+</div>
+
+<!-- settings overlay -->
+<div class="overlay" id="settings-overlay">
+  <div class="overlay-header">
+    <span class="overlay-action" id="settings-close">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </span>
+    <span class="overlay-action">settings</span>
+  </div>
+  <div class="overlay-body">
+
+    <div class="settings-section">
+      <p class="settings-label">appearance</p>
+      <div class="settings-row">
+        <span class="settings-row-label">theme</span>
+        <div class="theme-toggle" id="theme-toggle">
+          <span class="theme-option" data-theme-value="light">light</span>
+          <span class="theme-option" data-theme-value="dark">dark</span>
+          <span class="theme-option" data-theme-value="auto">auto</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <p class="settings-label">sync</p>
+      <div class="settings-field">
+        <p class="settings-field-label">gist id</p>
+        <input type="text" class="settings-input" id="gist-id-input" autocomplete="off" autocorrect="off" spellcheck="false">
+      </div>
+      <div class="settings-field">
+        <p class="settings-field-label">github token</p>
+        <input type="password" class="settings-input" id="token-input" autocomplete="off" autocorrect="off" spellcheck="false">
+      </div>
+      <div class="settings-row">
+        <span class="settings-meta" id="sync-status">not configured</span>
+        <button class="settings-button" id="sync-now-btn">sync now</button>
+      </div>
+      <div class="settings-button-row">
+        <button class="settings-button" id="create-gist-btn">create new gist</button>
+        <button class="settings-button" id="save-sync-btn">save</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <p class="settings-label">data</p>
+      <div class="settings-data-row" id="export-btn">
+        <span class="settings-data-label">export to json</span>
+        <span style="color: var(--text-tertiary);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
+        </span>
+      </div>
+      <div class="settings-data-row" id="import-btn">
+        <span class="settings-data-label">import from json</span>
+        <span style="color: var(--text-tertiary);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
+        </span>
+      </div>
+      <input type="file" id="import-file" accept="application/json,.json" class="hidden-file">
+    </div>
+
+    <div class="settings-section">
+      <p class="settings-label">archive</p>
+      <p class="settings-meta" id="archive-stats"></p>
+    </div>
+
+  </div>
+</div>
+
+<!-- delete confirmation -->
+<div class="confirm-backdrop" id="confirm-backdrop">
+  <div class="confirm">
+    <p class="confirm-text">delete this memory? this can't be undone.</p>
+    <div class="confirm-buttons">
+      <button class="confirm-btn" id="confirm-cancel">cancel</button>
+      <button class="confirm-btn primary" id="confirm-delete">delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   shoebox — single-file PWA
+   ============================================================ */
+
+/* ---------- prompts (stems) ---------- */
+const PROMPTS = [
+  "someone you talked to recently",
+  "a small kindness",
+  "a stranger",
+  "something that made you laugh out loud",
+  "a moment you almost didn't notice",
+  "a conversation that lingered",
+  "someone who surprised you",
+  "a tiny adventure",
+  "a comfortable silence",
+  "the smallest gesture",
+  "a question someone asked you",
+  "the look on someone's face",
+  "an unexpected place",
+  "a five minute friendship",
+  "something you overheard",
+  "a person you'll probably never see again",
+  "a familiar face on a normal day",
+  "a moment of being seen",
+  "a story someone told you",
+  "the way someone said your name",
+  "a small thing bel did",
+  "a regular at the place you frequent",
+  "a moment that felt like a movie",
+  "when you said yes to something",
+  "a detail you don't want to forget",
+  "the kind of weather that holds a memory",
+  "a hand on a shoulder",
+  "a thank you that meant more than it sounded",
+  "a doorway moment",
+  "something that almost didn't happen"
+];
+
+function getCurrentPrompt() {
+  // pick a stem based on the current week so it's stable for the week
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 1);
+  const week = Math.floor((now - start) / (7 * 24 * 60 * 60 * 1000));
+  const idx = (week + now.getFullYear() * 7) % PROMPTS.length;
+  return PROMPTS[idx];
+}
+
+/* ---------- storage: indexeddb ---------- */
+const DB_NAME = "shoebox";
+const DB_VERSION = 1;
+const STORE = "entries";
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onerror = () => reject(req.error);
+    req.onsuccess = () => resolve(req.result);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(STORE)) {
+        db.createObjectStore(STORE, { keyPath: "id" });
+      }
+    };
+  });
+}
+
+async function dbAll() {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, "readonly");
+    const req = tx.objectStore(STORE).getAll();
+    req.onsuccess = () => resolve(req.result || []);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function dbPut(entry) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, "readwrite");
+    tx.objectStore(STORE).put(entry);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+async function dbDelete(id) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, "readwrite");
+    tx.objectStore(STORE).delete(id);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+async function dbClear() {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, "readwrite");
+    tx.objectStore(STORE).clear();
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+/* ---------- settings (localstorage) ---------- */
+const SETTINGS_KEY = "shoebox-settings";
+function loadSettings() {
+  try {
+    return JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {};
+  } catch { return {}; }
+}
+function saveSettings(s) {
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
+}
+
+/* ---------- state ---------- */
+const state = {
+  entries: [],         // sorted desc by created_at
+  currentReadId: null,
+  composeMode: "new",  // "new" or "edit"
+  syncStatus: "idle",  // idle | syncing | synced | error | unconfigured
+  lastSyncedAt: null
+};
+
+/* ---------- date formatting ---------- */
+function formatDate(iso) {
+  const d = new Date(iso);
+  const now = new Date();
+  const diffMs = now - d;
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  // same day
+  const sameDay = d.toDateString() === now.toDateString();
+  if (sameDay) return "today";
+
+  // yesterday
+  const yest = new Date(now); yest.setDate(now.getDate() - 1);
+  if (d.toDateString() === yest.toDateString()) return "yesterday";
+
+  // within the last 6 days
+  if (diffDays < 7) {
+    return d.toLocaleDateString(undefined, { weekday: "long" }).toLowerCase();
+  }
+
+  // within the previous week (7-13 days ago)
+  if (diffDays < 14) {
+    return "last " + d.toLocaleDateString(undefined, { weekday: "long" }).toLowerCase();
+  }
+
+  // within the last ~5 weeks
+  if (diffDays < 35) {
+    const weeks = Math.floor(diffDays / 7);
+    return weeks === 1 ? "a week ago" : weeks + " weeks ago";
+  }
+
+  // within current year
+  if (d.getFullYear() === now.getFullYear()) {
+    return d.toLocaleDateString(undefined, { month: "long", day: "numeric" }).toLowerCase();
+  }
+
+  // older
+  return d.toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" }).toLowerCase();
+}
+
+/* ---------- rendering ---------- */
+const scrollEl = document.getElementById("scroll");
+
+function render() {
+  // sort entries: newest first
+  state.entries.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+  // build snap items: prompt first, then entries
+  let html = '<div class="snap-item is-prompt"><p class="prompt-text">' + escapeHtml(getCurrentPrompt()) + '</p></div>';
+
+  if (state.entries.length === 0) {
+    html += '<div class="snap-item is-prompt"><p class="empty-state">tap + to add your first memory</p></div>';
+  } else {
+    for (const entry of state.entries) {
+      html += '<div class="snap-item" data-id="' + entry.id + '">' +
+              '<p class="entry-date">' + escapeHtml(formatDate(entry.created_at)) + '</p>' +
+              '<p class="entry-text">' + escapeHtml(entry.text) + '</p>' +
+              '</div>';
+    }
+  }
+
+  scrollEl.innerHTML = html;
+
+  // wire up entry taps
+  scrollEl.querySelectorAll(".snap-item[data-id]").forEach(el => {
+    el.addEventListener("click", () => openRead(el.dataset.id));
+  });
+
+  updateFocus();
+  updateArchiveStats();
+}
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+/* ---------- focus fade on scroll ---------- */
+function updateFocus() {
+  const items = scrollEl.querySelectorAll(".snap-item");
+  const rect = scrollEl.getBoundingClientRect();
+  const center = rect.top + rect.height / 2;
+  const maxDist = rect.height / 1.2;
+
+  items.forEach(item => {
+    const r = item.getBoundingClientRect();
+    const itemCenter = r.top + r.height / 2;
+    const dist = Math.abs(center - itemCenter);
+    const proximity = Math.max(0, 1 - dist / maxDist);
+    const opacity = 0.25 + proximity * 0.75;
+    item.style.opacity = opacity.toFixed(2);
+  });
+}
+scrollEl.addEventListener("scroll", updateFocus, { passive: true });
+
+/* ---------- compose / new entry ---------- */
+const composeOverlay = document.getElementById("compose-overlay");
+const composeInput = document.getElementById("compose-input");
+
+function openCompose() {
+  state.composeMode = "new";
+  composeInput.value = "";
+  composeOverlay.classList.add("is-open");
+  setTimeout(() => composeInput.focus(), 280);
+}
+
+function closeCompose() {
+  composeOverlay.classList.remove("is-open");
+  composeInput.blur();
+}
+
+async function saveCompose() {
+  const text = composeInput.value.trim();
+  if (!text) {
+    closeCompose();
+    return;
+  }
+  const now = new Date().toISOString();
+  const entry = {
+    id: crypto.randomUUID(),
+    text: text,
+    created_at: now,
+    updated_at: now
+  };
+  state.entries.push(entry);
+  await dbPut(entry);
+  render();
+  closeCompose();
+  schedulePush();
+}
+
+document.getElementById("add-btn").addEventListener("click", openCompose);
+document.getElementById("compose-done").addEventListener("click", saveCompose);
+document.getElementById("compose-cancel").addEventListener("click", closeCompose);
+
+/* ---------- read / view entry ---------- */
+const readOverlay = document.getElementById("read-overlay");
+const readBody = document.getElementById("read-body");
+const readMenu = document.getElementById("read-menu");
+
+function openRead(id) {
+  const entry = state.entries.find(e => e.id === id);
+  if (!entry) return;
+  state.currentReadId = id;
+  readBody.innerHTML =
+    '<p class="read-date">' + escapeHtml(formatDate(entry.created_at)) + '</p>' +
+    '<p class="read-text" id="read-text">' + escapeHtml(entry.text) + '</p>';
+  document.getElementById("read-text").addEventListener("click", enterEditMode);
+  readOverlay.classList.add("is-open");
+}
+
+function closeRead() {
+  readOverlay.classList.remove("is-open");
+  readMenu.classList.remove("is-open");
+  state.currentReadId = null;
+}
+
+function enterEditMode() {
+  const entry = state.entries.find(e => e.id === state.currentReadId);
+  if (!entry) return;
+  readBody.innerHTML =
+    '<p class="read-date">' + escapeHtml(formatDate(entry.created_at)) + '</p>' +
+    '<textarea class="read-textarea" id="read-edit">' + escapeHtml(entry.text) + '</textarea>';
+  const ta = document.getElementById("read-edit");
+  ta.focus();
+  // place cursor at end
+  ta.setSelectionRange(ta.value.length, ta.value.length);
+}
+
+async function saveReadEdit() {
+  const ta = document.getElementById("read-edit");
+  if (!ta) return;
+  const entry = state.entries.find(e => e.id === state.currentReadId);
+  if (!entry) return;
+  const newText = ta.value.trim();
+  if (!newText) {
+    // empty edit = delete
+    await deleteCurrentEntry();
+    return;
+  }
+  if (newText !== entry.text) {
+    entry.text = newText;
+    entry.updated_at = new Date().toISOString();
+    await dbPut(entry);
+    render();
+    schedulePush();
+  }
+  closeRead();
+}
+
+async function deleteCurrentEntry() {
+  const id = state.currentReadId;
+  if (!id) return;
+  state.entries = state.entries.filter(e => e.id !== id);
+  await dbDelete(id);
+  render();
+  closeRead();
+  schedulePush();
+}
+
+document.getElementById("read-close").addEventListener("click", () => {
+  // if mid-edit, save it
+  if (document.getElementById("read-edit")) {
+    saveReadEdit();
+  } else {
+    closeRead();
+  }
+});
+
+document.getElementById("read-menu-btn").addEventListener("click", (e) => {
+  e.stopPropagation();
+  readMenu.classList.toggle("is-open");
+});
+document.addEventListener("click", (e) => {
+  if (!readMenu.contains(e.target) && e.target.id !== "read-menu-btn") {
+    readMenu.classList.remove("is-open");
+  }
+});
+
+document.getElementById("menu-edit").addEventListener("click", () => {
+  readMenu.classList.remove("is-open");
+  enterEditMode();
+});
+
+document.getElementById("menu-delete").addEventListener("click", () => {
+  readMenu.classList.remove("is-open");
+  document.getElementById("confirm-backdrop").classList.add("is-open");
+});
+
+document.getElementById("confirm-cancel").addEventListener("click", () => {
+  document.getElementById("confirm-backdrop").classList.remove("is-open");
+});
+document.getElementById("confirm-delete").addEventListener("click", async () => {
+  document.getElementById("confirm-backdrop").classList.remove("is-open");
+  await deleteCurrentEntry();
+});
+
+/* ---------- shuffle ---------- */
+document.getElementById("shuffle-btn").addEventListener("click", () => {
+  if (state.entries.length === 0) return;
+  const items = scrollEl.querySelectorAll(".snap-item[data-id]");
+  if (items.length === 0) return;
+  const idx = Math.floor(Math.random() * items.length);
+  items[idx].scrollIntoView({ behavior: "smooth", block: "center" });
+});
+
+/* ---------- settings ---------- */
+const settingsOverlay = document.getElementById("settings-overlay");
+
+function openSettings() {
+  const s = loadSettings();
+  document.getElementById("gist-id-input").value = s.gistId || "";
+  document.getElementById("token-input").value = s.token || "";
+  setActiveTheme(s.theme || "auto");
+  updateSyncStatusText();
+  updateArchiveStats();
+  settingsOverlay.classList.add("is-open");
+}
+function closeSettings() {
+  settingsOverlay.classList.remove("is-open");
+}
+document.getElementById("settings-trigger").addEventListener("click", openSettings);
+document.getElementById("settings-close").addEventListener("click", closeSettings);
+
+document.getElementById("save-sync-btn").addEventListener("click", () => {
+  const s = loadSettings();
+  s.gistId = document.getElementById("gist-id-input").value.trim();
+  s.token = document.getElementById("token-input").value.trim();
+  saveSettings(s);
+  updateSyncStatusText();
+  flashButton("save-sync-btn", "saved");
+});
+
+function flashButton(id, msg) {
+  const btn = document.getElementById(id);
+  const original = btn.textContent;
+  btn.textContent = msg;
+  setTimeout(() => { btn.textContent = original; }, 1200);
+}
+
+/* theme */
+function setActiveTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  document.querySelectorAll(".theme-option").forEach(opt => {
+    opt.classList.toggle("is-active", opt.dataset.themeValue === theme);
+  });
+  const s = loadSettings();
+  s.theme = theme;
+  saveSettings(s);
+}
+document.querySelectorAll(".theme-option").forEach(opt => {
+  opt.addEventListener("click", () => setActiveTheme(opt.dataset.themeValue));
+});
+
+/* archive stats */
+function updateArchiveStats() {
+  const el = document.getElementById("archive-stats");
+  if (!el) return;
+  const n = state.entries.length;
+  if (n === 0) {
+    el.textContent = "no entries yet";
+    return;
+  }
+  const oldest = state.entries[state.entries.length - 1];
+  const d = new Date(oldest.created_at);
+  const monthYear = d.toLocaleDateString(undefined, { month: "long", year: "numeric" }).toLowerCase();
+  el.textContent = n + (n === 1 ? " entry" : " entries") + " since " + monthYear;
+}
+
+/* ---------- export / import ---------- */
+function exportData() {
+  const data = {
+    version: 1,
+    entries: state.entries,
+    exported_at: new Date().toISOString()
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "shoebox-" + new Date().toISOString().split("T")[0] + ".json";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+document.getElementById("export-btn").addEventListener("click", exportData);
+
+document.getElementById("import-btn").addEventListener("click", () => {
+  document.getElementById("import-file").click();
+});
+
+document.getElementById("import-file").addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const text = await file.text();
+    const data = JSON.parse(text);
+    if (!data.entries || !Array.isArray(data.entries)) {
+      alert("invalid file format");
+      return;
+    }
+    // merge: union by id, prefer most recently updated
+    const merged = mergeEntries(state.entries, data.entries);
+    state.entries = merged;
+    // persist all
+    for (const entry of merged) await dbPut(entry);
+    render();
+    schedulePush();
+    flashImport();
+  } catch (err) {
+    alert("could not import: " + err.message);
+  }
+  e.target.value = "";
+});
+
+function flashImport() {
+  const el = document.querySelector("#import-btn .settings-data-label");
+  const original = el.textContent;
+  el.textContent = "imported";
+  setTimeout(() => { el.textContent = original; }, 1500);
+}
+
+/* ---------- merge logic (used by sync and import) ---------- */
+function mergeEntries(localList, remoteList) {
+  const map = new Map();
+  for (const e of localList) map.set(e.id, e);
+  for (const e of remoteList) {
+    const existing = map.get(e.id);
+    if (!existing) {
+      map.set(e.id, e);
+    } else {
+      // prefer most recent updated_at
+      const localTime = new Date(existing.updated_at || existing.created_at).getTime();
+      const remoteTime = new Date(e.updated_at || e.created_at).getTime();
+      if (remoteTime > localTime) map.set(e.id, e);
+    }
+  }
+  return Array.from(map.values());
+}
+
+/* ---------- gist sync ---------- */
+const GIST_FILENAME = "shoebox.json";
+
+async function gistFetch(gistId, token) {
+  const res = await fetch("https://api.github.com/gists/" + gistId, {
+    headers: { "Authorization": "Bearer " + token, "Accept": "application/vnd.github+json" }
+  });
+  if (!res.ok) throw new Error("fetch failed: " + res.status);
+  const data = await res.json();
+  const file = data.files[GIST_FILENAME];
+  if (!file) return { version: 1, entries: [] };
+  // file content may be truncated for large gists; if so, fetch raw
+  let content = file.content;
+  if (file.truncated && file.raw_url) {
+    const r = await fetch(file.raw_url);
+    content = await r.text();
+  }
+  try {
+    return JSON.parse(content);
+  } catch {
+    return { version: 1, entries: [] };
+  }
+}
+
+async function gistPush(gistId, token, payload) {
+  const body = {
+    files: {
+      [GIST_FILENAME]: { content: JSON.stringify(payload, null, 2) }
+    }
+  };
+  const res = await fetch("https://api.github.com/gists/" + gistId, {
+    method: "PATCH",
+    headers: {
+      "Authorization": "Bearer " + token,
+      "Accept": "application/vnd.github+json",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) throw new Error("push failed: " + res.status);
+}
+
+async function gistCreate(token) {
+  const body = {
+    description: "shoebox memories",
+    public: false,
+    files: {
+      [GIST_FILENAME]: { content: JSON.stringify({ version: 1, entries: [] }, null, 2) }
+    }
+  };
+  const res = await fetch("https://api.github.com/gists", {
+    method: "POST",
+    headers: {
+      "Authorization": "Bearer " + token,
+      "Accept": "application/vnd.github+json",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) throw new Error("create failed: " + res.status);
+  const data = await res.json();
+  return data.id;
+}
+
+async function syncPull() {
+  const s = loadSettings();
+  if (!s.gistId || !s.token) return;
+  state.syncStatus = "syncing";
+  updateSyncStatusText();
+  try {
+    const remote = await gistFetch(s.gistId, s.token);
+    const merged = mergeEntries(state.entries, remote.entries || []);
+    // detect changes
+    const changed = merged.length !== state.entries.length ||
+      merged.some(m => {
+        const local = state.entries.find(e => e.id === m.id);
+        return !local || local.updated_at !== m.updated_at;
+      });
+    if (changed) {
+      state.entries = merged;
+      for (const e of merged) await dbPut(e);
+      render();
+    }
+    state.syncStatus = "synced";
+    state.lastSyncedAt = new Date().toISOString();
+    s.lastSyncedAt = state.lastSyncedAt;
+    saveSettings(s);
+  } catch (err) {
+    state.syncStatus = "error";
+    console.warn("pull failed:", err);
+  }
+  updateSyncStatusText();
+}
+
+async function syncPush() {
+  const s = loadSettings();
+  if (!s.gistId || !s.token) return;
+  state.syncStatus = "syncing";
+  updateSyncStatusText();
+  try {
+    // pull first to merge, then push
+    const remote = await gistFetch(s.gistId, s.token);
+    const merged = mergeEntries(state.entries, remote.entries || []);
+    state.entries = merged;
+    for (const e of merged) await dbPut(e);
+    await gistPush(s.gistId, s.token, { version: 1, entries: merged });
+    render();
+    state.syncStatus = "synced";
+    state.lastSyncedAt = new Date().toISOString();
+    s.lastSyncedAt = state.lastSyncedAt;
+    saveSettings(s);
+  } catch (err) {
+    state.syncStatus = "error";
+    console.warn("push failed:", err);
+  }
+  updateSyncStatusText();
+}
+
+let pushTimer = null;
+function schedulePush() {
+  const s = loadSettings();
+  if (!s.gistId || !s.token) return;
+  if (pushTimer) clearTimeout(pushTimer);
+  pushTimer = setTimeout(syncPush, 2000);
+}
+
+function updateSyncStatusText() {
+  const el = document.getElementById("sync-status");
+  if (!el) return;
+  const s = loadSettings();
+  if (!s.gistId || !s.token) {
+    el.textContent = "not configured";
+    return;
+  }
+  if (state.syncStatus === "syncing") {
+    el.textContent = "syncing…";
+    return;
+  }
+  if (state.syncStatus === "error") {
+    el.textContent = "sync failed";
+    return;
+  }
+  const last = state.lastSyncedAt || s.lastSyncedAt;
+  if (last) {
+    el.textContent = "last synced " + relativeTime(last);
+  } else {
+    el.textContent = "ready to sync";
+  }
+}
+
+function relativeTime(iso) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const min = Math.floor(diff / 60000);
+  if (min < 1) return "just now";
+  if (min < 60) return min + (min === 1 ? " minute ago" : " minutes ago");
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return hr + (hr === 1 ? " hour ago" : " hours ago");
+  const d = Math.floor(hr / 24);
+  return d + (d === 1 ? " day ago" : " days ago");
+}
+
+document.getElementById("sync-now-btn").addEventListener("click", syncPush);
+
+document.getElementById("create-gist-btn").addEventListener("click", async () => {
+  const token = document.getElementById("token-input").value.trim();
+  if (!token) {
+    alert("enter a github token first");
+    return;
+  }
+  flashButton("create-gist-btn", "creating…");
+  try {
+    const id = await gistCreate(token);
+    document.getElementById("gist-id-input").value = id;
+    const s = loadSettings();
+    s.gistId = id;
+    s.token = token;
+    saveSettings(s);
+    updateSyncStatusText();
+    flashButton("create-gist-btn", "created");
+  } catch (err) {
+    flashButton("create-gist-btn", "failed");
+  }
+});
+
+/* ---------- service worker (offline support) ---------- */
+if ("serviceWorker" in navigator) {
+  // inline service worker via blob URL — keeps everything in one file
+  const swCode = `
+    const CACHE = "shoebox-v1";
+    self.addEventListener("install", e => { self.skipWaiting(); });
+    self.addEventListener("activate", e => { e.waitUntil(self.clients.claim()); });
+    self.addEventListener("fetch", e => {
+      if (e.request.method !== "GET") return;
+      e.respondWith(
+        caches.match(e.request).then(cached => {
+          return cached || fetch(e.request).then(res => {
+            if (res.ok && e.request.url.startsWith(self.location.origin)) {
+              const clone = res.clone();
+              caches.open(CACHE).then(c => c.put(e.request, clone));
+            }
+            return res;
+          }).catch(() => cached);
+        })
+      );
+    });
+  `;
+  const blob = new Blob([swCode], { type: "application/javascript" });
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(() => {});
+}
+
+/* ---------- init ---------- */
+async function init() {
+  // theme
+  const s = loadSettings();
+  setActiveTheme(s.theme || "auto");
+
+  // load entries
+  try {
+    state.entries = await dbAll();
+  } catch (err) {
+    console.error("db load failed:", err);
+    state.entries = [];
+  }
+
+  if (s.lastSyncedAt) state.lastSyncedAt = s.lastSyncedAt;
+
+  render();
+
+  // pull from gist if configured
+  if (s.gistId && s.token) {
+    syncPull();
+  }
+}
+
+init();
+
+// re-render fade on resize
+window.addEventListener("resize", updateFocus);
+
+// prevent double-tap zoom on ios
+let lastTouch = 0;
+document.addEventListener("touchend", (e) => {
+  const now = Date.now();
+  if (now - lastTouch < 300) e.preventDefault();
+  lastTouch = now;
+}, { passive: false });
+
+</script>
+</body>
+</html>
