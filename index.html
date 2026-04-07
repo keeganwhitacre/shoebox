@@ -53,7 +53,7 @@
   }
 }
 
-/* ---------- reset ---------- */
+/* ---------- reset & layout ---------- */
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html, body {
   font-family: var(--font-sans);
@@ -64,15 +64,18 @@ html, body {
   overscroll-behavior: none;
   -webkit-font-smoothing: antialiased;
 }
-html { height: 100%; overflow: hidden; }
+
+/* 100dvh gracefully handles iOS Safari toolbars and keyboard sizing natively */
+html { height: 100dvh; overflow: hidden; }
 body {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 100dvh;
   width: 100%;
   overflow: hidden;
 }
-button, input, textarea, [contenteditable] {
+
+button, input, textarea {
   font: inherit;
   color: inherit;
   background: transparent;
@@ -81,53 +84,67 @@ button, input, textarea, [contenteditable] {
 }
 button { cursor: pointer; }
 
-/* ---------- main scroll view ---------- */
-.app {
-  display: flex;
+/* ---------- SPA Views ---------- */
+.view {
+  display: none;
   flex-direction: column;
   height: 100%;
-  position: relative;
+  width: 100%;
+  position: absolute;
+  inset: 0;
   background: var(--bg);
+  z-index: 10;
+}
+.view.is-active {
+  display: flex;
+}
+#view-feed {
+  z-index: 5; /* Base view */
 }
 
-.header {
+/* ---------- view headers & bodies ---------- */
+.view-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: max(env(safe-area-inset-top, 0px), 14px) 24px 16px;
   background: var(--bg);
+  flex-shrink: 0;
   position: relative;
   z-index: 10;
-  flex-shrink: 0;
 }
-.header-left, .header-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.header-label {
-  font-size: 15px;
-  color: var(--text-tertiary);
-  letter-spacing: 0.02em;
-  cursor: pointer;
-  padding: 4px 0;
-}
-.icon-btn {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-tertiary);
-  cursor: pointer;
-}
+.header-left, .header-right { display: flex; align-items: center; gap: 8px; }
+.header-label { font-size: 15px; color: var(--text-tertiary); letter-spacing: 0.02em; cursor: pointer; padding: 4px 0; }
+.icon-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; color: var(--text-tertiary); cursor: pointer; }
 .icon-btn svg { width: 18px; height: 18px; }
 
-.scroll-wrap {
-  position: relative;
-  flex: 1;
-  overflow: hidden;
+.view-action {
+  font-size: 16px;
+  color: var(--text-secondary);
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  padding: 12px 16px;
+  margin: -8px -12px;
+  font-weight: 500;
 }
+.view-action.is-icon {
+  color: var(--text-tertiary);
+  font-weight: 400;
+}
+
+.view-body {
+  flex: 1;
+  padding: 32px 28px 28px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.view-body.is-compose { padding-bottom: 0; overflow: hidden; }
+
+/* ---------- main feed scroll ---------- */
+.scroll-wrap { position: relative; flex: 1; overflow: hidden; }
 .scroll {
   height: 100%;
   overflow-y: auto;
@@ -151,12 +168,7 @@ button { cursor: pointer; }
 }
 .snap-item.is-prompt { cursor: default; }
 
-.entry-date {
-  font-size: 13px;
-  color: var(--text-tertiary);
-  margin-bottom: 12px;
-  letter-spacing: 0.02em;
-}
+.entry-date { font-size: 13px; color: var(--text-tertiary); margin-bottom: 12px; letter-spacing: 0.02em; }
 .entry-text {
   font-size: 19px;
   line-height: 1.55;
@@ -167,38 +179,12 @@ button { cursor: pointer; }
   white-space: pre-wrap;
 }
 
-.prompt-text {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 22px;
-  line-height: 1.45;
-  color: var(--text-secondary);
-}
+.prompt-text { font-family: var(--font-serif); font-style: italic; font-size: 22px; line-height: 1.45; color: var(--text-secondary); }
+.empty-state { font-size: 14px; color: var(--text-tertiary); text-align: center; font-style: italic; }
 
-.empty-state {
-  font-size: 14px;
-  color: var(--text-tertiary);
-  text-align: center;
-  font-style: italic;
-}
-
-.fade-top, .fade-bottom {
-  position: absolute;
-  left: 0;
-  right: 0;
-  pointer-events: none;
-  z-index: 2;
-}
-.fade-top {
-  top: 0;
-  height: 32px;
-  background: linear-gradient(to bottom, var(--bg), transparent);
-}
-.fade-bottom {
-  bottom: 0;
-  height: 80px;
-  background: linear-gradient(to top, var(--bg), transparent);
-}
+.fade-top, .fade-bottom { position: absolute; left: 0; right: 0; pointer-events: none; z-index: 2; }
+.fade-top { top: 0; height: 32px; background: linear-gradient(to bottom, var(--bg), transparent); }
+.fade-bottom { bottom: 0; height: 80px; background: linear-gradient(to top, var(--bg), transparent); }
 
 .fab {
   position: absolute;
@@ -217,54 +203,7 @@ button { cursor: pointer; }
 .fab:active { transform: scale(0.94); }
 .fab svg { width: 22px; height: 22px; stroke: var(--fab-fg); }
 
-/* ---------- overlay views (entry, settings) ---------- */
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: var(--bg);
-  display: flex;
-  flex-direction: column;
-  z-index: 100;
-  transform: translateY(100%);
-  transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
-}
-.overlay.is-open { transform: translateY(0); }
-
-.overlay-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: max(env(safe-area-inset-top, 0px), 14px) 24px 16px;
-  flex-shrink: 0;
-}
-.overlay-action {
-  font-size: 16px;
-  color: var(--text-secondary);
-  letter-spacing: 0.02em;
-  cursor: pointer;
-  padding: 12px 16px;
-  margin: -8px -12px;
-  font-weight: 500;
-}
-.overlay-action.is-icon {
-  color: var(--text-tertiary);
-  font-weight: 400;
-}
-
-.overlay-body {
-  flex: 1;
-  padding: 32px 28px 28px;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-.overlay-body.is-compose {
-  overflow: hidden;
-}
-
-/* compose */
+/* ---------- compose ---------- */
 .compose-textarea {
   flex: 1;
   width: 100%;
@@ -281,16 +220,12 @@ button { cursor: pointer; }
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   min-height: 0;
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 20px);
 }
 .compose-textarea::placeholder { color: var(--text-tertiary); }
 
-/* read */
-.read-date {
-  font-size: 14px;
-  color: var(--text-tertiary);
-  margin-bottom: 22px;
-  letter-spacing: 0.02em;
-}
+/* ---------- read / edit ---------- */
+.read-date { font-size: 14px; color: var(--text-tertiary); margin-bottom: 22px; letter-spacing: 0.02em; }
 .read-text {
   font-size: 20px;
   line-height: 1.6;
@@ -315,6 +250,7 @@ button { cursor: pointer; }
   font-family: var(--font-sans);
   caret-color: var(--text-primary);
   padding: 0;
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 20px);
 }
 
 /* popover menu */
@@ -332,21 +268,12 @@ button { cursor: pointer; }
   display: none;
 }
 .menu.is-open { display: block; }
-.menu-item {
-  display: block;
-  width: 100%;
-  text-align: left;
-  padding: 10px 16px;
-  font-size: 14px;
-  color: var(--text-primary);
-  cursor: pointer;
-}
+.menu-item { display: block; width: 100%; text-align: left; padding: 10px 16px; font-size: 14px; color: var(--text-primary); cursor: pointer; }
 .menu-item.danger { color: #c0392b; }
 [data-theme="dark"] .menu-item.danger { color: #e57373; }
-@media (prefers-color-scheme: dark) {
-  [data-theme="auto"] .menu-item.danger { color: #e57373; }
-}
+@media (prefers-color-scheme: dark) { [data-theme="auto"] .menu-item.danger { color: #e57373; } }
 
+/* ---------- delete confirmation ---------- */
 .confirm-backdrop {
   position: fixed;
   inset: 0;
@@ -358,181 +285,54 @@ button { cursor: pointer; }
   padding: 24px;
 }
 .confirm-backdrop.is-open { display: flex; }
-.confirm {
-  background: var(--bg);
-  border-radius: 16px;
-  padding: 24px;
-  max-width: 280px;
-  width: 100%;
-  text-align: center;
-}
-.confirm-text {
-  font-size: 15px;
-  color: var(--text-primary);
-  margin-bottom: 20px;
-  line-height: 1.5;
-}
-.confirm-buttons {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-}
-.confirm-btn {
-  padding: 8px 20px;
-  font-size: 14px;
-  color: var(--text-secondary);
-  border: 0.5px solid var(--border-strong);
-  border-radius: 8px;
-  cursor: pointer;
-}
-.confirm-btn.primary {
-  color: #c0392b;
-  border-color: #c0392b;
-}
+.confirm { background: var(--bg); border-radius: 16px; padding: 24px; max-width: 280px; width: 100%; text-align: center; }
+.confirm-text { font-size: 15px; color: var(--text-primary); margin-bottom: 20px; line-height: 1.5; }
+.confirm-buttons { display: flex; gap: 12px; justify-content: center; }
+.confirm-btn { padding: 8px 20px; font-size: 14px; color: var(--text-secondary); border: 0.5px solid var(--border-strong); border-radius: 8px; cursor: pointer; }
+.confirm-btn.primary { color: #c0392b; border-color: #c0392b; }
 [data-theme="dark"] .confirm-btn.primary { color: #e57373; border-color: #e57373; }
-@media (prefers-color-scheme: dark) {
-  [data-theme="auto"] .confirm-btn.primary { color: #e57373; border-color: #e57373; }
-}
+@media (prefers-color-scheme: dark) { [data-theme="auto"] .confirm-btn.primary { color: #e57373; border-color: #e57373; } }
 
-/* settings */
-.settings-section {
-  margin-bottom: 36px;
-}
-.settings-label {
-  font-size: 11px;
-  color: var(--text-tertiary);
-  margin-bottom: 12px;
-  letter-spacing: 0.04em;
-}
-.settings-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 6px 0;
-}
-.settings-row-label {
-  font-size: 15px;
-  color: var(--text-primary);
-}
-.settings-field {
-  margin-bottom: 18px;
-}
-.settings-field-label {
-  font-size: 12px;
-  color: var(--text-tertiary);
-  margin-bottom: 6px;
-}
-.settings-input {
-  width: 100%;
-  padding: 10px 12px;
-  border: 0.5px solid var(--border-strong);
-  border-radius: 8px;
-  font-size: 14px;
-  color: var(--text-primary);
-  background: transparent;
-  font-family: var(--font-mono);
-}
-.settings-button {
-  font-size: 13px;
-  color: var(--text-primary);
-  padding: 6px 12px;
-  border: 0.5px solid var(--border-strong);
-  border-radius: 8px;
-  cursor: pointer;
-}
-.settings-button-row {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 12px;
-}
-.settings-data-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 0;
-  cursor: pointer;
-}
-.settings-data-label {
-  font-size: 14px;
-  color: var(--text-primary);
-}
-.settings-meta {
-  font-size: 12px;
-  color: var(--text-tertiary);
-}
+/* ---------- settings ---------- */
+.settings-section { margin-bottom: 36px; }
+.settings-label { font-size: 11px; color: var(--text-tertiary); margin-bottom: 12px; letter-spacing: 0.04em; }
+.settings-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; }
+.settings-row-label { font-size: 15px; color: var(--text-primary); }
+.settings-field { margin-bottom: 18px; }
+.settings-field-label { font-size: 12px; color: var(--text-tertiary); margin-bottom: 6px; }
+.settings-input { width: 100%; padding: 10px 12px; border: 0.5px solid var(--border-strong); border-radius: 8px; font-size: 14px; color: var(--text-primary); background: transparent; font-family: var(--font-mono); }
+.settings-button { font-size: 13px; color: var(--text-primary); padding: 6px 12px; border: 0.5px solid var(--border-strong); border-radius: 8px; cursor: pointer; }
+.settings-button-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.settings-data-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; cursor: pointer; }
+.settings-data-label { font-size: 14px; color: var(--text-primary); }
+.settings-meta { font-size: 12px; color: var(--text-tertiary); }
 
-.theme-toggle {
-  display: flex;
-  gap: 2px;
-  background: var(--surface);
-  padding: 3px;
-  border-radius: 8px;
-}
-.theme-option {
-  font-size: 12px;
-  padding: 5px 11px;
-  border-radius: 5px;
-  color: var(--text-tertiary);
-  cursor: pointer;
-}
-.theme-option.is-active {
-  background: var(--bg);
-  color: var(--text-primary);
-}
+.theme-toggle { display: flex; gap: 2px; background: var(--surface); padding: 3px; border-radius: 8px; }
+.theme-option { font-size: 12px; padding: 5px 11px; border-radius: 5px; color: var(--text-tertiary); cursor: pointer; }
+.theme-option.is-active { background: var(--bg); color: var(--text-primary); }
 
-/* toggle switch */
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 40px;
-  height: 24px;
-}
+.switch { position: relative; display: inline-block; width: 40px; height: 24px; }
 .switch input { display: none; }
-.switch-slider {
-  position: absolute;
-  inset: 0;
-  background: var(--surface);
-  border-radius: 24px;
-  transition: background 0.2s;
-  cursor: pointer;
-}
-.switch-slider::before {
-  content: "";
-  position: absolute;
-  width: 18px;
-  height: 18px;
-  left: 3px;
-  top: 3px;
-  background: var(--bg);
-  border: 0.5px solid var(--border-strong);
-  border-radius: 50%;
-  transition: transform 0.2s;
-}
-.switch input:checked + .switch-slider {
-  background: var(--text-primary);
-}
-.switch input:checked + .switch-slider::before {
-  transform: translateX(16px);
-  border-color: var(--text-primary);
-}
+.switch-slider { position: absolute; inset: 0; background: var(--surface); border-radius: 24px; transition: background 0.2s; cursor: pointer; }
+.switch-slider::before { content: ""; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px; background: var(--bg); border: 0.5px solid var(--border-strong); border-radius: 50%; transition: transform 0.2s; }
+.switch input:checked + .switch-slider { background: var(--text-primary); }
+.switch input:checked + .switch-slider::before { transform: translateX(16px); border-color: var(--text-primary); }
 
-/* lowercase mode — applies text-transform without altering stored data */
+/* lowercase mode */
 body.lowercase-mode .entry-text,
 body.lowercase-mode .read-text,
 body.lowercase-mode .read-textarea,
 body.lowercase-mode .compose-textarea {
   text-transform: lowercase;
 }
-
-/* hidden file input */
 .hidden-file { display: none; }
 </style>
 </head>
 <body>
 
-<div class="app" id="app">
-  <div class="header">
+<!-- FEED VIEW -->
+<div class="view is-active" id="view-feed">
+  <div class="view-header">
     <div class="header-left">
       <span class="header-label" id="settings-trigger">shoebox</span>
     </div>
@@ -554,26 +354,26 @@ body.lowercase-mode .compose-textarea {
   </button>
 </div>
 
-<!-- compose / new entry overlay -->
-<div class="overlay" id="compose-overlay">
-  <div class="overlay-header">
-    <span class="overlay-action is-icon" id="compose-cancel">
+<!-- COMPOSE VIEW -->
+<div class="view" id="view-compose">
+  <div class="view-header">
+    <span class="view-action is-icon" id="compose-cancel">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
     </span>
-    <span class="overlay-action" id="compose-done">done</span>
+    <span class="view-action" id="compose-done">done</span>
   </div>
-  <div class="overlay-body is-compose">
+  <div class="view-body is-compose">
     <textarea class="compose-textarea" id="compose-input" autocomplete="off" autocorrect="on" autocapitalize="none" spellcheck="false" enterkeyhint="enter"></textarea>
   </div>
 </div>
 
-<!-- read / view entry overlay -->
-<div class="overlay" id="read-overlay">
-  <div class="overlay-header">
-    <span class="overlay-action is-icon" id="read-close">
+<!-- READ VIEW -->
+<div class="view" id="view-read">
+  <div class="view-header">
+    <span class="view-action is-icon" id="read-close">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
     </span>
-    <span class="overlay-action is-icon" id="read-menu-btn">
+    <span class="view-action is-icon" id="read-menu-btn">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>
     </span>
   </div>
@@ -581,19 +381,18 @@ body.lowercase-mode .compose-textarea {
     <button class="menu-item" id="menu-edit">edit</button>
     <button class="menu-item danger" id="menu-delete">delete</button>
   </div>
-  <div class="overlay-body" id="read-body"></div>
+  <div class="view-body" id="read-body"></div>
 </div>
 
-<!-- settings overlay -->
-<div class="overlay" id="settings-overlay">
-  <div class="overlay-header">
-    <span class="overlay-action is-icon" id="settings-close">
+<!-- SETTINGS VIEW -->
+<div class="view" id="view-settings">
+  <div class="view-header">
+    <span class="view-action is-icon" id="settings-close">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
     </span>
-    <span class="overlay-action is-icon">settings</span>
+    <span class="view-action is-icon">settings</span>
   </div>
-  <div class="overlay-body">
-
+  <div class="view-body">
     <div class="settings-section">
       <p class="settings-label">appearance</p>
       <div class="settings-row">
@@ -612,7 +411,6 @@ body.lowercase-mode .compose-textarea {
         </label>
       </div>
     </div>
-
     <div class="settings-section">
       <p class="settings-label">sync</p>
       <div class="settings-field">
@@ -632,7 +430,6 @@ body.lowercase-mode .compose-textarea {
         <button class="settings-button" id="save-sync-btn">save</button>
       </div>
     </div>
-
     <div class="settings-section">
       <p class="settings-label">data</p>
       <div class="settings-data-row" id="export-btn">
@@ -649,12 +446,10 @@ body.lowercase-mode .compose-textarea {
       </div>
       <input type="file" id="import-file" accept="application/json,.json" class="hidden-file">
     </div>
-
     <div class="settings-section">
       <p class="settings-label">archive</p>
       <p class="settings-meta" id="archive-stats"></p>
     </div>
-
   </div>
 </div>
 
@@ -671,8 +466,14 @@ body.lowercase-mode .compose-textarea {
 
 <script>
 /* ============================================================
-   shoebox — single-file PWA
+   shoebox — single-file PWA (SPA Architecture)
    ============================================================ */
+
+/* ---------- View Router ---------- */
+function showView(viewId) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('is-active'));
+  document.getElementById(viewId).classList.add('is-active');
+}
 
 /* ---------- prompts (stems) ---------- */
 const PROMPTS = [
@@ -709,7 +510,6 @@ const PROMPTS = [
 ];
 
 function getCurrentPrompt() {
-  // pick a stem based on the current week so it's stable for the week
   const now = new Date();
   const start = new Date(now.getFullYear(), 0, 1);
   const week = Math.floor((now - start) / (7 * 24 * 60 * 60 * 1000));
@@ -766,16 +566,6 @@ async function dbDelete(id) {
   });
 }
 
-async function dbClear() {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE, "readwrite");
-    tx.objectStore(STORE).clear();
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
-}
-
 /* ---------- settings (localstorage) ---------- */
 const SETTINGS_KEY = "shoebox-settings";
 function loadSettings() {
@@ -789,10 +579,9 @@ function saveSettings(s) {
 
 /* ---------- state ---------- */
 const state = {
-  entries: [],         // sorted desc by created_at
+  entries: [],
   currentReadId: null,
-  composeMode: "new",  // "new" or "edit"
-  syncStatus: "idle",  // idle | syncing | synced | error | unconfigured
+  syncStatus: "idle",
   lastSyncedAt: null
 };
 
@@ -803,47 +592,28 @@ function formatDate(iso) {
   const diffMs = now - d;
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-  // same day
-  const sameDay = d.toDateString() === now.toDateString();
-  if (sameDay) return "today";
-
-  // yesterday
+  if (d.toDateString() === now.toDateString()) return "today";
+  
   const yest = new Date(now); yest.setDate(now.getDate() - 1);
   if (d.toDateString() === yest.toDateString()) return "yesterday";
 
-  // within the last 6 days
-  if (diffDays < 7) {
-    return d.toLocaleDateString(undefined, { weekday: "long" }).toLowerCase();
-  }
-
-  // within the previous week (7-13 days ago)
-  if (diffDays < 14) {
-    return "last " + d.toLocaleDateString(undefined, { weekday: "long" }).toLowerCase();
-  }
-
-  // within the last ~5 weeks
+  if (diffDays < 7) return d.toLocaleDateString(undefined, { weekday: "long" }).toLowerCase();
+  if (diffDays < 14) return "last " + d.toLocaleDateString(undefined, { weekday: "long" }).toLowerCase();
   if (diffDays < 35) {
     const weeks = Math.floor(diffDays / 7);
     return weeks === 1 ? "a week ago" : weeks + " weeks ago";
   }
-
-  // within current year
-  if (d.getFullYear() === now.getFullYear()) {
-    return d.toLocaleDateString(undefined, { month: "long", day: "numeric" }).toLowerCase();
-  }
-
-  // older
+  if (d.getFullYear() === now.getFullYear()) return d.toLocaleDateString(undefined, { month: "long", day: "numeric" }).toLowerCase();
+  
   return d.toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" }).toLowerCase();
 }
 
-/* ---------- rendering ---------- */
+/* ---------- rendering feed ---------- */
 const scrollEl = document.getElementById("scroll");
 
 function render() {
-  // sort entries: newest first
   state.entries.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
-  // build snap items: prompt first, then entries
   let html = '<div class="snap-item is-prompt"><p class="prompt-text">' + escapeHtml(getCurrentPrompt()) + '</p></div>';
 
   if (state.entries.length === 0) {
@@ -859,7 +629,6 @@ function render() {
 
   scrollEl.innerHTML = html;
 
-  // wire up entry taps
   scrollEl.querySelectorAll(".snap-item[data-id]").forEach(el => {
     el.addEventListener("click", () => openRead(el.dataset.id));
   });
@@ -895,21 +664,19 @@ function updateFocus() {
 }
 scrollEl.addEventListener("scroll", updateFocus, { passive: true });
 
-/* ---------- compose / new entry ---------- */
-const composeOverlay = document.getElementById("compose-overlay");
+/* ---------- compose flow ---------- */
 const composeInput = document.getElementById("compose-input");
 
 function openCompose() {
-  state.composeMode = "new";
+  showView("view-compose");
   composeInput.value = "";
-  // focus synchronously with preventScroll to stop iOS from jumping layout
-  composeInput.focus({ preventScroll: true });
-  composeOverlay.classList.add("is-open");
+  // Synchronous focus call triggered directly from tap. Keyboard opens natively!
+  composeInput.focus({ preventScroll: true }); 
 }
 
 function closeCompose() {
-  composeOverlay.classList.remove("is-open");
   composeInput.blur();
+  showView("view-feed");
 }
 
 async function saveCompose() {
@@ -936,8 +703,7 @@ document.getElementById("add-btn").addEventListener("click", openCompose);
 document.getElementById("compose-done").addEventListener("click", saveCompose);
 document.getElementById("compose-cancel").addEventListener("click", closeCompose);
 
-/* ---------- read / view entry ---------- */
-const readOverlay = document.getElementById("read-overlay");
+/* ---------- read / edit flow ---------- */
 const readBody = document.getElementById("read-body");
 const readMenu = document.getElementById("read-menu");
 
@@ -949,13 +715,13 @@ function openRead(id) {
     '<p class="read-date">' + escapeHtml(formatDate(entry.created_at)) + '</p>' +
     '<p class="read-text" id="read-text">' + escapeHtml(entry.text) + '</p>';
   document.getElementById("read-text").addEventListener("click", enterEditMode);
-  readOverlay.classList.add("is-open");
+  showView("view-read");
 }
 
 function closeRead() {
-  readOverlay.classList.remove("is-open");
   readMenu.classList.remove("is-open");
   state.currentReadId = null;
+  showView("view-feed");
 }
 
 function enterEditMode() {
@@ -979,7 +745,6 @@ async function saveReadEdit() {
   if (!entry) return;
   const newText = ta.value.trim();
   if (!newText) {
-    // empty edit = delete
     await deleteCurrentEntry();
     return;
   }
@@ -1004,7 +769,6 @@ async function deleteCurrentEntry() {
 }
 
 document.getElementById("read-close").addEventListener("click", () => {
-  // if mid-edit, save it
   if (document.getElementById("read-edit")) {
     saveReadEdit();
   } else {
@@ -1050,8 +814,6 @@ document.getElementById("shuffle-btn").addEventListener("click", () => {
 });
 
 /* ---------- settings ---------- */
-const settingsOverlay = document.getElementById("settings-overlay");
-
 function openSettings() {
   const s = loadSettings();
   document.getElementById("gist-id-input").value = s.gistId || "";
@@ -1059,10 +821,10 @@ function openSettings() {
   setActiveTheme(s.theme || "auto");
   updateSyncStatusText();
   updateArchiveStats();
-  settingsOverlay.classList.add("is-open");
+  showView("view-settings");
 }
 function closeSettings() {
-  settingsOverlay.classList.remove("is-open");
+  showView("view-feed");
 }
 document.getElementById("settings-trigger").addEventListener("click", openSettings);
 document.getElementById("settings-close").addEventListener("click", closeSettings);
@@ -1161,10 +923,8 @@ document.getElementById("import-file").addEventListener("change", async (e) => {
       alert("invalid file format");
       return;
     }
-    // merge: union by id, prefer most recently updated
     const merged = mergeEntries(state.entries, data.entries);
     state.entries = merged;
-    // persist all
     for (const entry of merged) await dbPut(entry);
     render();
     schedulePush();
@@ -1182,7 +942,6 @@ function flashImport() {
   setTimeout(() => { el.textContent = original; }, 1500);
 }
 
-/* ---------- merge logic (used by sync and import) ---------- */
 function mergeEntries(localList, remoteList) {
   const map = new Map();
   for (const e of localList) map.set(e.id, e);
@@ -1191,7 +950,6 @@ function mergeEntries(localList, remoteList) {
     if (!existing) {
       map.set(e.id, e);
     } else {
-      // prefer most recent updated_at
       const localTime = new Date(existing.updated_at || existing.created_at).getTime();
       const remoteTime = new Date(e.updated_at || e.created_at).getTime();
       if (remoteTime > localTime) map.set(e.id, e);
@@ -1211,17 +969,13 @@ async function gistFetch(gistId, token) {
   const data = await res.json();
   const file = data.files[GIST_FILENAME];
   if (!file) return { version: 1, entries: [] };
-  // file content may be truncated for large gists; if so, fetch raw
   let content = file.content;
   if (file.truncated && file.raw_url) {
     const r = await fetch(file.raw_url);
     content = await r.text();
   }
-  try {
-    return JSON.parse(content);
-  } catch {
-    return { version: 1, entries: [] };
-  }
+  try { return JSON.parse(content); } 
+  catch { return { version: 1, entries: [] }; }
 }
 
 async function gistPush(gistId, token, payload) {
@@ -1272,7 +1026,6 @@ async function syncPull() {
   try {
     const remote = await gistFetch(s.gistId, s.token);
     const merged = mergeEntries(state.entries, remote.entries || []);
-    // detect changes
     const changed = merged.length !== state.entries.length ||
       merged.some(m => {
         const local = state.entries.find(e => e.id === m.id);
@@ -1300,7 +1053,6 @@ async function syncPush() {
   state.syncStatus = "syncing";
   updateSyncStatusText();
   try {
-    // pull first to merge, then push
     const remote = await gistFetch(s.gistId, s.token);
     const merged = mergeEntries(state.entries, remote.entries || []);
     state.entries = merged;
@@ -1384,9 +1136,8 @@ document.getElementById("create-gist-btn").addEventListener("click", async () =>
   }
 });
 
-/* ---------- service worker (offline support) ---------- */
+/* ---------- service worker ---------- */
 if ("serviceWorker" in navigator) {
-  // inline service worker via blob URL — keeps everything in one file
   const swCode = `
     const CACHE = "shoebox-v1";
     self.addEventListener("install", e => { self.skipWaiting(); });
@@ -1413,13 +1164,10 @@ if ("serviceWorker" in navigator) {
 
 /* ---------- init ---------- */
 async function init() {
-  // theme
   const s = loadSettings();
   setActiveTheme(s.theme || "auto");
-  // lowercase mode (default on)
   setLowercaseMode(s.lowercase !== false);
 
-  // load entries
   try {
     state.entries = await dbAll();
   } catch (err) {
@@ -1431,7 +1179,6 @@ async function init() {
 
   render();
 
-  // pull from gist if configured
   if (s.gistId && s.token) {
     syncPull();
   }
@@ -1439,10 +1186,8 @@ async function init() {
 
 init();
 
-// re-render fade on resize
 window.addEventListener("resize", updateFocus);
 
-// prevent double-tap zoom on ios
 let lastTouch = 0;
 document.addEventListener("touchend", (e) => {
   const now = Date.now();
