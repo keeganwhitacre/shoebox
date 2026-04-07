@@ -180,7 +180,7 @@ button { cursor: pointer; }
 }
 
 .prompt-text { font-family: var(--font-serif); font-style: italic; font-size: 22px; line-height: 1.45; color: var(--text-secondary); }
-.empty-state { font-size: 14px; color: var(--text-tertiary); text-align: center; font-style: italic; }
+.empty-state { font-size: 14px; color: var(--text-tertiary); text-align: center; font-style: italic; margin-top: 16px; }
 
 .fade-top, .fade-bottom { position: absolute; left: 0; right: 0; pointer-events: none; z-index: 2; }
 .fade-top { top: 0; height: 32px; background: linear-gradient(to bottom, var(--bg), transparent); }
@@ -506,15 +506,59 @@ const PROMPTS = [
   "a hand on a shoulder",
   "a thank you that meant more than it sounded",
   "a doorway moment",
-  "something that almost didn't happen"
+  "something that almost didn't happen",
+  "something that felt out of place, but in a good way",
+  "a sharp contrast you noticed (colors, sounds, or moods)",
+  "a detail that most people probably walked right past",
+  "a shift in the background noise",
+  "a sudden change in the lighting or weather",
+  "a moment of quiet competence you observed in someone else",
+  "an interaction that required absolutely no words",
+  "a task that felt surprisingly rhythmic or meditative",
+  "the exact moment your energy shifted today",
+  "a problem that solved itself",
+  "a piece of the day you wish you could have paused",
+  "something that gave you a sudden sense of scale",
+  "a sound you usually tune out, but appreciated today",
+  "a reminder of something much older than you",
+  "a brief pocket of absolute calm",
+  "the most colorful thing you saw today"
 ];
 
-function getCurrentPrompt() {
+function getBasePromptIndex() {
   const now = new Date();
-  const start = new Date(now.getFullYear(), 0, 1);
-  const week = Math.floor((now - start) / (7 * 24 * 60 * 60 * 1000));
-  const idx = (week + now.getFullYear() * 7) % PROMPTS.length;
-  return PROMPTS[idx];
+  const start = new Date(now.getFullYear(), 0, 0);
+  const diff = now - start;
+  const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
+  return (dayOfYear + now.getFullYear() * 365) % PROMPTS.length;
+}
+
+function getCurrentPrompt() {
+  const s = loadSettings();
+  const todayStr = new Date().toLocaleDateString();
+  if (s.lastPromptSwapDate === todayStr && s.swappedPromptIndex !== undefined) {
+    return PROMPTS[s.swappedPromptIndex];
+  }
+  return PROMPTS[getBasePromptIndex()];
+}
+
+function handlePromptSwap() {
+  const s = loadSettings();
+  const todayStr = new Date().toLocaleDateString();
+  
+  if (s.lastPromptSwapDate === todayStr) return; // Already swapped today
+  
+  const baseIdx = getBasePromptIndex();
+  let newIdx = Math.floor(Math.random() * PROMPTS.length);
+  while (newIdx === baseIdx) {
+    newIdx = Math.floor(Math.random() * PROMPTS.length);
+  }
+  
+  s.lastPromptSwapDate = todayStr;
+  s.swappedPromptIndex = newIdx;
+  saveSettings(s);
+  
+  render();
 }
 
 /* ---------- storage: indexeddb ---------- */
@@ -614,7 +658,13 @@ const scrollEl = document.getElementById("scroll");
 function render() {
   state.entries.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
-  let html = '<div class="snap-item is-prompt"><p class="prompt-text">' + escapeHtml(getCurrentPrompt()) + '</p></div>';
+  const s = loadSettings();
+  const todayStr = new Date().toLocaleDateString();
+  const canSwap = s.lastPromptSwapDate !== todayStr;
+
+  let html = '<div class="snap-item is-prompt" id="daily-prompt" ' + (canSwap ? 'style="cursor: pointer;"' : '') + '>';
+  html += '<p class="prompt-text">' + escapeHtml(getCurrentPrompt()) + '</p>';
+  html += '</div>';
 
   if (state.entries.length === 0) {
     html += '<div class="snap-item is-prompt"><p class="empty-state">tap + to add your first memory</p></div>';
@@ -628,6 +678,11 @@ function render() {
   }
 
   scrollEl.innerHTML = html;
+
+  const promptEl = scrollEl.querySelector("#daily-prompt");
+  if (promptEl && canSwap) {
+    promptEl.addEventListener("click", handlePromptSwap);
+  }
 
   scrollEl.querySelectorAll(".snap-item[data-id]").forEach(el => {
     el.addEventListener("click", () => openRead(el.dataset.id));
