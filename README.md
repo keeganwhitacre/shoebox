@@ -1,6 +1,6 @@
 # shoebox
 
-! (./github header.png)
+![Logo](github header.png)
 
 A minimalist, local-first memory archive designed for savoring.
 
