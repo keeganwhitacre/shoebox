@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>shoebox — privacy policy</title>
+<meta name="description" content="shoebox privacy policy. No data is collected, transmitted, or stored by us.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400;1,500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --ink: #111111;
+  --ink-mid: #555555;
+  --ink-faint: #aaaaaa;
+  --paper: #f7f5f0;
+  --line: rgba(0,0,0,0.1);
+  --serif: "Lora", "Iowan Old Style", Georgia, serif;
+  --mono: "DM Mono", ui-monospace, monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 32px 80px;
+}
+
+nav {
+  padding: 40px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 64px;
+}
+.nav-logo {
+  font-family: var(--serif);
+  font-size: 17px;
+  font-style: italic;
+  color: var(--ink);
+  text-decoration: none;
+}
+.nav-link {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--ink-mid);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  transition: color 0.2s;
+}
+.nav-link:hover { color: var(--ink); }
+
+.page-eyebrow {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  color: var(--ink-faint);
+  margin-bottom: 20px;
+}
+
+h1 {
+  font-size: clamp(28px, 4.5vw, 40px);
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+}
+
+.updated {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 300;
+  color: var(--ink-faint);
+  letter-spacing: 0.04em;
+  margin-bottom: 52px;
+}
+
+.ruled { border: none; border-top: 0.5px solid var(--line); margin: 44px 0; }
+
+.section-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  color: var(--ink-faint);
+  margin-bottom: 16px;
+}
+
+h2 {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 14px;
+  color: var(--ink);
+}
+
+p {
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--ink-mid);
+  margin-bottom: 16px;
+}
+p:last-child { margin-bottom: 0; }
+
+strong {
+  font-weight: 500;
+  font-style: italic;
+  color: var(--ink);
+}
+
+a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--line);
+  transition: text-decoration-color 0.2s;
+}
+a:hover { text-decoration-color: var(--ink); }
+
+.summary-block {
+  background: rgba(0,0,0,0.03);
+  border-left: 2px solid var(--ink);
+  padding: 20px 24px;
+  border-radius: 0 4px 4px 0;
+  margin-bottom: 52px;
+}
+.summary-block p {
+  font-size: 16px;
+  color: var(--ink-mid);
+  margin-bottom: 8px;
+}
+.summary-block p:last-child { margin-bottom: 0; }
+
+footer {
+  border-top: 0.5px solid var(--line);
+  padding-top: 32px;
+  margin-top: 64px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.footer-logo {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 15px;
+  color: var(--ink-faint);
+}
+.footer-links { display: flex; gap: 24px; }
+.footer-link {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 300;
+  color: var(--ink-faint);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  transition: color 0.2s;
+}
+.footer-link:hover { color: var(--ink); }
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  opacity: 0.55;
+  mix-blend-mode: multiply;
+}
+
+@media (max-width: 560px) {
+  .wrap { padding: 0 22px 60px; }
+  footer { flex-direction: column; align-items: flex-start; }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav>
+    <a class="nav-logo" href="/">shoebox.</a>
+    <a class="nav-link" href="/">← back</a>
+  </nav>
+
+  <p class="page-eyebrow">legal</p>
+  <h1>Privacy Policy</h1>
+  <p class="updated">Last updated: April 2026</p>
+
+  <div class="summary-block">
+    <p><strong>The short version:</strong> shoebox collects nothing. Your data never touches our servers because we don't have any. Everything stays on your device and, optionally, in your own iCloud account.</p>
+  </div>
+
+  <h2>What data we collect</h2>
+  <p><strong>None.</strong> shoebox does not collect, transmit, or store any personal information, usage data, analytics, crash reports, or any other data on any server operated by us.</p>
+
+  <hr class="ruled">
+
+  <h2>Where your data lives</h2>
+  <p>
+    Everything you write in shoebox is stored locally on your device using the device's built-in storage (IndexedDB / on-device storage). It never leaves your device unless you explicitly use iCloud sync.
+  </p>
+  <p>
+    If you enable iCloud sync, your entries are synced via <strong>Apple iCloud</strong> — Apple's infrastructure, governed by Apple's privacy policy. We never have access to your iCloud data. The sync goes directly between your devices through Apple's systems.
+  </p>
+
+  <hr class="ruled">
+
+  <h2>Deletion</h2>
+  <p>
+    When you delete a memory, it is deleted immediately and permanently from your device. There is no server-side copy, no soft delete, no recovery. If you have iCloud sync enabled, the deletion propagates to iCloud on the next sync — after which it is gone everywhere.
+  </p>
+
+  <hr class="ruled">
+
+  <h2>Third-party services</h2>
+  <p>shoebox uses no third-party analytics, advertising SDKs, crash reporting tools, or tracking libraries of any kind.</p>
+  <p>The only network request the app ever makes is to Apple's iCloud servers, and only when you have enabled iCloud sync.</p>
+
+  <hr class="ruled">
+
+  <h2>Advertising</h2>
+  <p>shoebox contains no advertising and we do not share data with any advertising network.</p>
+
+  <hr class="ruled">
+
+  <h2>Children's privacy</h2>
+  <p>shoebox does not collect data from any users, including children under 13. Because no data is collected or transmitted, there is nothing to govern under COPPA or similar regulations.</p>
+
+  <hr class="ruled">
+
+  <h2>Changes to this policy</h2>
+  <p>
+    If the app ever changes in a way that affects how data is handled, this page will be updated and the date at the top will reflect that change. Given the architecture of the app, such a change would be significant and would be communicated clearly.
+  </p>
+
+  <hr class="ruled">
+
+  <h2>Contact</h2>
+  <p>
+    Questions about this policy or the app can be directed to
+    <a href="mailto:keegan@keeganwhitacre.com">keegan@keeganwhitacre.com</a>.
+  </p>
+
+  <footer>
+    <span class="footer-logo">shoebox.</span>
+    <div class="footer-links">
+      <a class="footer-link" href="/">home</a>
+      <a class="footer-link" href="https://apps.apple.com/app/id-YOURAPPID" target="_blank">app store</a>
+      <a class="footer-link" href="mailto:keegan@keeganwhitacre.com">contact</a>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>
