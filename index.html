@@ -114,12 +114,12 @@ button { cursor: pointer; }
   z-index: 10;
 }
 .header-left, .header-right { display: flex; align-items: center; gap: 8px; }
-.header-label { font-size: 15px; color: var(--text-tertiary); letter-spacing: 0.02em; cursor: pointer; padding: 4px 0; }
-.icon-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; color: var(--text-tertiary); cursor: pointer; }
-.icon-btn svg { width: 18px; height: 18px; }
+.header-label { font-size: 18px; color: var(--text-tertiary); letter-spacing: 0.02em; cursor: pointer; padding: 4px 0; }
+.icon-btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: var(--text-tertiary); cursor: pointer; }
+.icon-btn svg { width: 24px; height: 24px; }
 
 .view-action {
-  font-size: 16px;
+  font-size: 18px;
   color: var(--text-secondary);
   letter-spacing: 0.02em;
   cursor: pointer;
@@ -168,7 +168,7 @@ button { cursor: pointer; }
 }
 .snap-item.is-prompt { cursor: default; }
 
-.entry-date { font-size: 13px; color: var(--text-tertiary); margin-bottom: 12px; letter-spacing: 0.02em; }
+.entry-date { font-size: 15px; color: var(--text-tertiary); margin-bottom: 12px; letter-spacing: 0.02em; }
 .entry-text {
   font-size: 19px;
   line-height: 1.55;
@@ -179,7 +179,7 @@ button { cursor: pointer; }
   white-space: pre-wrap;
 }
 
-.prompt-text { font-family: var(--font-serif); font-style: italic; font-size: 22px; line-height: 1.45; color: var(--text-secondary); }
+.prompt-text { font-family: var(--font-serif); font-style: italic; font-size: 28px; line-height: 1.45; color: var(--text-secondary); }
 .empty-state { font-size: 14px; color: var(--text-tertiary); text-align: center; font-style: italic; margin-top: 16px; }
 
 .fade-top, .fade-bottom { position: absolute; left: 0; right: 0; pointer-events: none; z-index: 2; }
@@ -190,8 +190,8 @@ button { cursor: pointer; }
   position: absolute;
   bottom: max(env(safe-area-inset-bottom, 0px), 24px);
   right: 24px;
-  width: 56px;
-  height: 56px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   background: var(--fab-bg);
   display: flex;
@@ -201,7 +201,7 @@ button { cursor: pointer; }
   transition: transform 0.1s;
 }
 .fab:active { transform: scale(0.94); }
-.fab svg { width: 22px; height: 22px; stroke: var(--fab-fg); }
+.fab svg { width: 28px; height: 28px; stroke: var(--fab-fg); }
 
 /* ---------- compose ---------- */
 .compose-textarea {
@@ -225,7 +225,7 @@ button { cursor: pointer; }
 .compose-textarea::placeholder { color: var(--text-tertiary); }
 
 /* ---------- read / edit ---------- */
-.read-date { font-size: 14px; color: var(--text-tertiary); margin-bottom: 22px; letter-spacing: 0.02em; }
+.read-date { font-size: 15px; color: var(--text-tertiary); margin-bottom: 22px; letter-spacing: 0.02em; }
 .read-text {
   font-size: 20px;
   line-height: 1.6;
