@@ -1,5 +1,3 @@
-# shoebox
-
 ![Logo](github_header.png)
 
 A minimalist, local-first memory archive designed for savoring.
