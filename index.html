@@ -1,1255 +1,607 @@
+
 <!DOCTYPE html>
 <html lang="en" data-theme="auto">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="shoebox">
-<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
-<title>shoebox</title>
-<link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogInNob2Vib3giLAogICJzaG9ydF9uYW1lIjogInNob2Vib3giLAogICJzdGFydF91cmwiOiAiLiIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgIm9yaWVudGF0aW9uIjogInBvcnRyYWl0IiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjZmZmZmZmIiwKICAidGhlbWVfY29sb3IiOiAiI2ZmZmZmZiIsCiAgImljb25zIjogW10KfQ==">
-<style>
-/* ---------- theme ---------- */
-:root {
-  --bg: #ffffff;
-  --text-primary: #000000;
-  --text-secondary: #5a5a5a;
-  --text-tertiary: #999999;
-  --border: rgba(0, 0, 0, 0.08);
-  --border-strong: rgba(0, 0, 0, 0.15);
-  --surface: #f3f3f1;
-  --fab-bg: #000000;
-  --fab-fg: #ffffff;
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-  --font-serif: "Iowan Old Style", "Palatino", "Palatino Linotype", Georgia, serif;
-  --font-mono: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Stream">
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+    <title>Stream</title>
+    
+    <!-- Bulletproof Base64 Manifest -->
+    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiU3RyZWFtIiwic2hvcnRfbmFtZSI6IlN0cmVhbSIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsIm9yaWVudGF0aW9uIjoicG9ydHJhaXQiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiI2ZmZmZmZiIsInRoZW1lX2NvbG9yIjoiI2ZmZmZmZiIsImljb25zIjpbXX0=">
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23000'/%3E%3Cpath d='M160 256 Q 256 160 352 256 Q 256 352 160 256' fill='none' stroke='%23fff' stroke-width='32' stroke-linecap='round'/%3E%3C/svg%3E">
 
-[data-theme="dark"] {
-  --bg: #0a0a0a;
-  --text-primary: #f0f0f0;
-  --text-secondary: #8a8a8a;
-  --text-tertiary: #5a5a5a;
-  --border: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.15);
-  --surface: #1a1a1a;
-  --fab-bg: #f0f0f0;
-  --fab-fg: #0a0a0a;
-}
+    <style>
+        :root {
+            --bg: #ffffff;
+            --surface: #f2f2f7; 
+            --text-main: #000000;
+            --text-muted: #8e8e93;
+            --border: #e5e5ea;
+            --accent: #000000; 
+            --danger: #ff3b30;
+            --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
 
-@media (prefers-color-scheme: dark) {
-  [data-theme="auto"] {
-    --bg: #0a0a0a;
-    --text-primary: #f0f0f0;
-    --text-secondary: #8a8a8a;
-    --text-tertiary: #5a5a5a;
-    --border: rgba(255, 255, 255, 0.08);
-    --border-strong: rgba(255, 255, 255, 0.15);
-    --surface: #1a1a1a;
-    --fab-bg: #f0f0f0;
-    --fab-fg: #0a0a0a;
-  }
-}
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #000000;
+                --surface: #1c1c1e;
+                --text-main: #ffffff;
+                --text-muted: #636366;
+                --border: #38383a;
+                --accent: #ffffff;
+                --danger: #ff453a;
+            }
+        }
 
-/* ---------- reset & layout ---------- */
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body {
-  font-family: var(--font-sans);
-  background: var(--bg);
-  color: var(--text-primary);
-  font-size: 16px;
-  line-height: 1.65;
-  overscroll-behavior: none;
-  -webkit-font-smoothing: antialiased;
-}
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* 100dvh gracefully handles iOS Safari toolbars and keyboard sizing natively */
-html { height: 100dvh; overflow: hidden; }
-body {
-  display: flex;
-  flex-direction: column;
-  height: 100dvh;
-  width: 100%;
-  overflow: hidden;
-}
+        body, html {
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            -webkit-font-smoothing: antialiased;
+            overflow: hidden; 
+        }
 
-button, input, textarea {
-  font: inherit;
-  color: inherit;
-  background: transparent;
-  border: none;
-  outline: none;
-}
-button { cursor: pointer; }
+        button { font-family: inherit; }
 
-/* ---------- SPA Views ---------- */
-.view {
-  display: none;
-  flex-direction: column;
-  height: 100%;
-  width: 100%;
-  position: absolute;
-  inset: 0;
-  background: var(--bg);
-  z-index: 10;
-}
-.view.is-active {
-  display: flex;
-}
-#view-feed {
-  z-index: 5; /* Base view */
-}
+        #app {
+            display: flex;
+            flex-direction: column;
+            height: 100dvh;
+        }
 
-/* ---------- view headers & bodies ---------- */
-.view-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: max(env(safe-area-inset-top, 0px), 14px) 24px 16px;
-  background: var(--bg);
-  flex-shrink: 0;
-  position: relative;
-  z-index: 10;
-}
-.header-left, .header-right { display: flex; align-items: center; gap: 8px; }
-.header-label { font-size: 18px; color: var(--text-tertiary); letter-spacing: 0.02em; cursor: pointer; padding: 4px 0; }
-.icon-btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: var(--text-tertiary); cursor: pointer; }
-.icon-btn svg { width: 24px; height: 24px; }
+        .view {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            animation: fadeIn 0.3s ease;
+        }
+        .view.active { display: flex; }
 
-.view-action {
-  font-size: 18px;
-  color: var(--text-secondary);
-  letter-spacing: 0.02em;
-  cursor: pointer;
-  padding: 12px 16px;
-  margin: -8px -12px;
-  font-weight: 500;
-}
-.view-action.is-icon {
-  color: var(--text-tertiary);
-  font-weight: 400;
-}
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
 
-.view-body {
-  flex: 1;
-  padding: 32px 28px 28px;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-.view-body.is-compose { padding-bottom: 0; overflow: hidden; }
+        /* --- Header --- */
+        header {
+            padding: calc(1rem + env(safe-area-inset-top)) 1.5rem 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            background: var(--bg);
+        }
 
-/* ---------- main feed scroll ---------- */
-.scroll-wrap { position: relative; flex: 1; overflow: hidden; }
-.scroll {
-  height: 100%;
-  overflow-y: auto;
-  scroll-snap-type: y mandatory;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  padding: 0 24px;
-  -webkit-overflow-scrolling: touch;
-}
-.scroll::-webkit-scrollbar { display: none; }
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: -0.03em;
+        }
 
-.snap-item {
-  scroll-snap-align: center;
-  min-height: 320px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 24px 0;
-  cursor: pointer;
-  transition: opacity 0.2s ease-out;
-}
-.snap-item.is-prompt { cursor: default; }
+        .btn-text {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 0.5rem;
+            margin: -0.5rem;
+            transition: color 0.2s;
+        }
+        .btn-text:active { color: var(--text-main); }
 
-.entry-date { font-size: 15px; color: var(--text-tertiary); margin-bottom: 12px; letter-spacing: 0.02em; }
-.entry-text {
-  font-size: 19px;
-  line-height: 1.55;
-  color: var(--text-primary);
-  font-weight: 500;
-  -webkit-text-stroke: 0.2px currentColor;
-  word-wrap: break-word;
-  white-space: pre-wrap;
-}
+        /* --- Idle View --- */
+        #archive {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 1.5rem 1.5rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            -webkit-overflow-scrolling: touch;
+        }
 
-.prompt-text { font-family: var(--font-serif); font-style: italic; font-size: 28px; line-height: 1.45; color: var(--text-secondary); }
-.empty-state { font-size: 14px; color: var(--text-tertiary); text-align: center; font-style: italic; margin-top: 16px; }
+        .empty-state {
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
 
-.fade-top, .fade-bottom { position: absolute; left: 0; right: 0; pointer-events: none; z-index: 2; }
-.fade-top { top: 0; height: 32px; background: linear-gradient(to bottom, var(--bg), transparent); }
-.fade-bottom { bottom: 0; height: 80px; background: linear-gradient(to top, var(--bg), transparent); }
+        .empty-state p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            text-align: center;
+        }
 
-.fab {
-  position: absolute;
-  bottom: max(env(safe-area-inset-bottom, 0px), 24px);
-  right: 24px;
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: var(--fab-bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 20;
-  transition: transform 0.1s;
-}
-.fab:active { transform: scale(0.94); }
-.fab svg { width: 28px; height: 28px; stroke: var(--fab-fg); }
+        .empty-state .subtext {
+            font-size: 0.75rem;
+            opacity: 0.6;
+        }
 
-/* ---------- compose ---------- */
-.compose-textarea {
-  flex: 1;
-  width: 100%;
-  font-size: 19px;
-  line-height: 1.6;
-  color: var(--text-primary);
-  font-weight: 500;
-  -webkit-text-stroke: 0.2px currentColor;
-  resize: none;
-  border: none;
-  background: transparent;
-  font-family: var(--font-sans);
-  caret-color: var(--text-primary);
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  min-height: 0;
-  padding-bottom: max(env(safe-area-inset-bottom, 0px), 20px);
-}
-.compose-textarea::placeholder { color: var(--text-tertiary); }
+        .log-entry {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
 
-/* ---------- read / edit ---------- */
-.read-date { font-size: 15px; color: var(--text-tertiary); margin-bottom: 22px; letter-spacing: 0.02em; }
-.read-text {
-  font-size: 20px;
-  line-height: 1.6;
-  color: var(--text-primary);
-  font-weight: 500;
-  -webkit-text-stroke: 0.2px currentColor;
-  word-wrap: break-word;
-  white-space: pre-wrap;
-  cursor: text;
-}
-.read-textarea {
-  font-size: 20px;
-  line-height: 1.6;
-  color: var(--text-primary);
-  font-weight: 500;
-  -webkit-text-stroke: 0.2px currentColor;
-  width: 100%;
-  flex: 1;
-  resize: none;
-  border: none;
-  background: transparent;
-  font-family: var(--font-sans);
-  caret-color: var(--text-primary);
-  padding: 0;
-  padding-bottom: max(env(safe-area-inset-bottom, 0px), 20px);
-}
+        .log-time {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
 
-/* popover menu */
-.menu {
-  position: absolute;
-  top: 56px;
-  right: 20px;
-  background: var(--bg);
-  border: 0.5px solid var(--border-strong);
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-  padding: 6px 0;
-  min-width: 140px;
-  z-index: 200;
-  display: none;
-}
-.menu.is-open { display: block; }
-.menu-item { display: block; width: 100%; text-align: left; padding: 10px 16px; font-size: 14px; color: var(--text-primary); cursor: pointer; }
-.menu-item.danger { color: #c0392b; }
-[data-theme="dark"] .menu-item.danger { color: #e57373; }
-@media (prefers-color-scheme: dark) { [data-theme="auto"] .menu-item.danger { color: #e57373; } }
+        .log-text {
+            font-size: 1.1rem;
+            line-height: 1.5;
+            color: var(--text-main);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
 
-/* ---------- delete confirmation ---------- */
-.confirm-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-  z-index: 300;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-}
-.confirm-backdrop.is-open { display: flex; }
-.confirm { background: var(--bg); border-radius: 16px; padding: 24px; max-width: 280px; width: 100%; text-align: center; }
-.confirm-text { font-size: 15px; color: var(--text-primary); margin-bottom: 20px; line-height: 1.5; }
-.confirm-buttons { display: flex; gap: 12px; justify-content: center; }
-.confirm-btn { padding: 8px 20px; font-size: 14px; color: var(--text-secondary); border: 0.5px solid var(--border-strong); border-radius: 8px; cursor: pointer; }
-.confirm-btn.primary { color: #c0392b; border-color: #c0392b; }
-[data-theme="dark"] .confirm-btn.primary { color: #e57373; border-color: #e57373; }
-@media (prefers-color-scheme: dark) { [data-theme="auto"] .confirm-btn.primary { color: #e57373; border-color: #e57373; } }
+        /* Controller */
+        #setup-bar {
+            padding: 1rem 1.5rem calc(1rem + env(safe-area-inset-bottom)) 1.5rem;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            flex-shrink: 0;
+        }
 
-/* ---------- settings ---------- */
-.settings-section { margin-bottom: 36px; }
-.settings-label { font-size: 11px; color: var(--text-tertiary); margin-bottom: 12px; letter-spacing: 0.04em; }
-.settings-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; }
-.settings-row-label { font-size: 15px; color: var(--text-primary); }
-.settings-field { margin-bottom: 18px; }
-.settings-field-label { font-size: 12px; color: var(--text-tertiary); margin-bottom: 6px; }
-.settings-input { width: 100%; padding: 10px 12px; border: 0.5px solid var(--border-strong); border-radius: 8px; font-size: 14px; color: var(--text-primary); background: transparent; font-family: var(--font-mono); }
-.settings-button { font-size: 13px; color: var(--text-primary); padding: 6px 12px; border: 0.5px solid var(--border-strong); border-radius: 8px; cursor: pointer; }
-.settings-button-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
-.settings-data-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; cursor: pointer; }
-.settings-data-label { font-size: 14px; color: var(--text-primary); }
-.settings-meta { font-size: 12px; color: var(--text-tertiary); }
+        .time-picker {
+            display: flex;
+            align-items: center;
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 0 1rem;
+            height: 3rem;
+            border: 1px solid var(--border);
+        }
 
-.theme-toggle { display: flex; gap: 2px; background: var(--surface); padding: 3px; border-radius: 8px; }
-.theme-option { font-size: 12px; padding: 5px 11px; border-radius: 5px; color: var(--text-tertiary); cursor: pointer; }
-.theme-option.is-active { background: var(--bg); color: var(--text-primary); }
+        .time-picker input {
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 1.25rem;
+            font-weight: 600;
+            width: 2.5rem;
+            text-align: center;
+            outline: none;
+            padding: 0;
+            font-family: inherit;
+        }
+        
+        .time-picker input::placeholder {
+            color: var(--text-muted);
+            opacity: 0.7;
+        }
+        
+        .time-picker span {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-left: 0.25rem;
+            font-weight: 500;
+        }
 
-.switch { position: relative; display: inline-block; width: 40px; height: 24px; }
-.switch input { display: none; }
-.switch-slider { position: absolute; inset: 0; background: var(--surface); border-radius: 24px; transition: background 0.2s; cursor: pointer; }
-.switch-slider::before { content: ""; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px; background: var(--bg); border: 0.5px solid var(--border-strong); border-radius: 50%; transition: transform 0.2s; }
-.switch input:checked + .switch-slider { background: var(--text-primary); }
-.switch input:checked + .switch-slider::before { transform: translateX(16px); border-color: var(--text-primary); }
+        /* Burn Mode Toggle */
+        .btn-toggle {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            border-radius: 12px;
+            height: 3rem;
+            padding: 0 1rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-/* lowercase mode */
-body.lowercase-mode .entry-text,
-body.lowercase-mode .read-text,
-body.lowercase-mode .read-textarea,
-body.lowercase-mode .compose-textarea {
-  text-transform: lowercase;
-}
-.hidden-file { display: none; }
-</style>
+        .btn-toggle.active {
+            color: var(--danger);
+            border-color: var(--danger);
+            background: rgba(255, 59, 48, 0.05);
+        }
+
+        .btn-start {
+            flex: 1;
+            background: var(--accent);
+            color: var(--bg);
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            height: 3rem;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+        .btn-start:active { transform: scale(0.97); }
+
+        /* --- Active Session View --- */
+        #session-header {
+            padding: calc(1rem + env(safe-area-inset-top)) 1.5rem 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+            background: var(--bg);
+        }
+
+        #timer {
+            font-size: 1.5rem;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+            transition: color 0.3s;
+            color: var(--text-main);
+        }
+
+        #active-stack {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .stack-item {
+            font-size: 1.1rem;
+            line-height: 1.5;
+            color: var(--text-muted);
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #input-area {
+            padding: 1rem 1.5rem calc(1rem + env(safe-area-inset-bottom)) 1.5rem;
+            background: var(--bg);
+            border-top: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        #stream-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 1.25rem;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+            padding: 0;
+            min-height: 3rem;
+            max-height: 25vh;
+            font-family: inherit;
+        }
+
+        #stream-input::placeholder { color: var(--text-muted); opacity: 0.5; }
+
+    </style>
 </head>
 <body>
 
-<!-- FEED VIEW -->
-<div class="view is-active" id="view-feed">
-  <div class="view-header">
-    <div class="header-left">
-      <span class="header-label" id="settings-trigger">shoebox.</span>
-    </div>
-    <div class="header-right">
-      <button class="icon-btn" id="shuffle-btn" aria-label="shuffle">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
-      </button>
-    </div>
-  </div>
+    <div id="app">
+        
+        <div id="view-idle" class="view active">
+            <header>
+                <div class="logo">Stream</div>
+                <button id="btn-clear" class="btn-text">Clear</button>
+            </header>
 
-  <div class="scroll-wrap">
-    <div class="scroll" id="scroll"></div>
-    <div class="fade-top"></div>
-    <div class="fade-bottom"></div>
-  </div>
-
-  <button class="fab" id="add-btn" aria-label="add memory">
-    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-  </button>
-</div>
-
-<!-- COMPOSE VIEW -->
-<div class="view" id="view-compose">
-  <div class="view-header">
-    <span class="view-action is-icon" id="compose-cancel">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
-    </span>
-    <span class="view-action" id="compose-done">done</span>
-  </div>
-  <div class="view-body is-compose">
-    <textarea class="compose-textarea" id="compose-input" autocomplete="off" autocorrect="on" autocapitalize="none" spellcheck="false" enterkeyhint="enter"></textarea>
-  </div>
-</div>
-
-<!-- READ VIEW -->
-<div class="view" id="view-read">
-  <div class="view-header">
-    <span class="view-action is-icon" id="read-close">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
-    </span>
-    <span class="view-action is-icon" id="read-menu-btn">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>
-    </span>
-  </div>
-  <div class="menu" id="read-menu">
-    <button class="menu-item" id="menu-edit">edit</button>
-    <button class="menu-item danger" id="menu-delete">delete</button>
-  </div>
-  <div class="view-body" id="read-body"></div>
-</div>
-
-<!-- SETTINGS VIEW -->
-<div class="view" id="view-settings">
-  <div class="view-header">
-    <span class="view-action is-icon" id="settings-close">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
-    </span>
-    <span class="view-action is-icon">settings</span>
-  </div>
-  <div class="view-body">
-    <div class="settings-section">
-      <p class="settings-label">appearance</p>
-      <div class="settings-row">
-        <span class="settings-row-label">theme</span>
-        <div class="theme-toggle" id="theme-toggle">
-          <span class="theme-option" data-theme-value="light">light</span>
-          <span class="theme-option" data-theme-value="dark">dark</span>
-          <span class="theme-option" data-theme-value="auto">auto</span>
+            <div id="archive"></div>
+            
+            <div id="setup-bar">
+                <div class="time-picker">
+                    <input type="number" id="time-input" placeholder="∞" min="1" max="60" inputmode="numeric">
+                    <span>min</span>
+                </div>
+                <button id="btn-burn" class="btn-toggle">Save</button>
+                <button id="btn-start" class="btn-start">Start</button>
+            </div>
         </div>
-      </div>
-      <div class="settings-row" style="margin-top: 14px;">
-        <span class="settings-row-label">lowercase</span>
-        <label class="switch">
-          <input type="checkbox" id="lowercase-toggle">
-          <span class="switch-slider"></span>
-        </label>
-      </div>
+
+        <div id="view-active" class="view">
+            <div id="session-header">
+                <div id="timer">∞</div>
+                <button id="btn-end" class="btn-text" style="color: var(--danger);">End Session</button>
+            </div>
+
+            <div id="active-stack"></div>
+
+            <div id="input-area">
+                <textarea 
+                    id="stream-input" 
+                    placeholder="Keep moving..."
+                    spellcheck="false"
+                    autocomplete="off"
+                ></textarea>
+            </div>
+        </div>
+
     </div>
-    <div class="settings-section">
-      <p class="settings-label">sync</p>
-      <div class="settings-field">
-        <p class="settings-field-label">gist id</p>
-        <input type="text" class="settings-input" id="gist-id-input" autocomplete="off" autocorrect="off" spellcheck="false">
-      </div>
-      <div class="settings-field">
-        <p class="settings-field-label">github token</p>
-        <input type="password" class="settings-input" id="token-input" autocomplete="off" autocorrect="off" spellcheck="false">
-      </div>
-      <div class="settings-row">
-        <span class="settings-meta" id="sync-status">not configured</span>
-        <button class="settings-button" id="sync-now-btn">sync now</button>
-      </div>
-      <div class="settings-button-row">
-        <button class="settings-button" id="create-gist-btn">create new gist</button>
-        <button class="settings-button" id="save-sync-btn">save</button>
-      </div>
-    </div>
-    <div class="settings-section">
-      <p class="settings-label">data</p>
-      <div class="settings-data-row" id="export-btn">
-        <span class="settings-data-label">export to json</span>
-        <span style="color: var(--text-tertiary);">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
-        </span>
-      </div>
-      <div class="settings-data-row" id="import-btn">
-        <span class="settings-data-label">import from json</span>
-        <span style="color: var(--text-tertiary);">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
-        </span>
-      </div>
-      <input type="file" id="import-file" accept="application/json,.json" class="hidden-file">
-    </div>
-    <div class="settings-section">
-      <p class="settings-label">archive</p>
-      <p class="settings-meta" id="archive-stats"></p>
-    </div>
-  </div>
-</div>
 
-<!-- delete confirmation -->
-<div class="confirm-backdrop" id="confirm-backdrop">
-  <div class="confirm">
-    <p class="confirm-text">delete this memory? this can't be undone.</p>
-    <div class="confirm-buttons">
-      <button class="confirm-btn" id="confirm-cancel">cancel</button>
-      <button class="confirm-btn primary" id="confirm-delete">delete</button>
-    </div>
-  </div>
-</div>
-
-<script>
-/* ============================================================
-   shoebox — single-file PWA (SPA Architecture)
-   ============================================================ */
-
-/* ---------- View Router ---------- */
-function showView(viewId) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('is-active'));
-  document.getElementById(viewId).classList.add('is-active');
-}
-
-/* ---------- prompts (stems) ---------- */
-const PROMPTS = [
-  "someone you talked to recently",
-  "a small kindness",
-  "a stranger",
-  "something that made you laugh out loud",
-  "a moment you almost didn't notice",
-  "a conversation that lingered",
-  "someone who surprised you",
-  "a tiny adventure",
-  "a comfortable silence",
-  "the smallest gesture",
-  "a question someone asked you",
-  "the look on someone's face",
-  "an unexpected place",
-  "a five minute friendship",
-  "something you overheard",
-  "a person you'll probably never see again",
-  "a familiar face on a normal day",
-  "a moment of being seen",
-  "a story someone told you",
-  "the way someone said your name",
-  "a small thing someone in your life did",
-  "a regular at the place you frequent",
-  "a moment that felt like a movie",
-  "when you said yes to something",
-  "a detail you don't want to forget",
-  "the kind of weather that holds a memory",
-  "a hand on a shoulder",
-  "a thank you that meant more than it sounded",
-  "a doorway moment",
-  "something that almost didn't happen",
-  "something that felt out of place, but in a good way",
-  "a sharp contrast you noticed (colors, sounds, or moods)",
-  "a detail that most people probably walked right past",
-  "a shift in the background noise",
-  "a sudden change in the lighting or weather",
-  "a moment of quiet competence you observed in someone else",
-  "an interaction that required absolutely no words",
-  "a task that felt surprisingly rhythmic or meditative",
-  "the exact moment your energy shifted today",
-  "a problem that solved itself",
-  "a piece of the day you wish you could have paused",
-  "something that gave you a sudden sense of scale",
-  "a sound you usually tune out, but appreciated today",
-  "a reminder of something much older than you",
-  "a brief pocket of absolute calm",
-  "the most colorful thing you saw today"
-];
-
-function getBasePromptIndex() {
-  const now = new Date();
-  const start = new Date(now.getFullYear(), 0, 0);
-  const diff = now - start;
-  const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
-  return (dayOfYear + now.getFullYear() * 365) % PROMPTS.length;
-}
-
-function getCurrentPrompt() {
-  const s = loadSettings();
-  const todayStr = new Date().toLocaleDateString();
-  if (s.lastPromptSwapDate === todayStr && s.swappedPromptIndex !== undefined) {
-    return PROMPTS[s.swappedPromptIndex];
-  }
-  return PROMPTS[getBasePromptIndex()];
-}
-
-function handlePromptSwap() {
-  const s = loadSettings();
-  const todayStr = new Date().toLocaleDateString();
-  
-  if (s.lastPromptSwapDate === todayStr) return; // Already swapped today
-  
-  const baseIdx = getBasePromptIndex();
-  let newIdx = Math.floor(Math.random() * PROMPTS.length);
-  while (newIdx === baseIdx) {
-    newIdx = Math.floor(Math.random() * PROMPTS.length);
-  }
-  
-  s.lastPromptSwapDate = todayStr;
-  s.swappedPromptIndex = newIdx;
-  saveSettings(s);
-  
-  render();
-}
-
-/* ---------- storage: indexeddb ---------- */
-const DB_NAME = "shoebox";
-const DB_VERSION = 1;
-const STORE = "entries";
-
-function openDB() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, DB_VERSION);
-    req.onerror = () => reject(req.error);
-    req.onsuccess = () => resolve(req.result);
-    req.onupgradeneeded = (e) => {
-      const db = e.target.result;
-      if (!db.objectStoreNames.contains(STORE)) {
-        db.createObjectStore(STORE, { keyPath: "id" });
-      }
-    };
-  });
-}
-
-async function dbAll() {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE, "readonly");
-    const req = tx.objectStore(STORE).getAll();
-    req.onsuccess = () => resolve(req.result || []);
-    req.onerror = () => reject(req.error);
-  });
-}
-
-async function dbPut(entry) {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE, "readwrite");
-    tx.objectStore(STORE).put(entry);
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
-}
-
-async function dbDelete(id) {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE, "readwrite");
-    tx.objectStore(STORE).delete(id);
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
-}
-
-/* ---------- settings (localstorage) ---------- */
-const SETTINGS_KEY = "shoebox-settings";
-function loadSettings() {
-  try {
-    return JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {};
-  } catch { return {}; }
-}
-function saveSettings(s) {
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
-}
-
-/* ---------- state ---------- */
-const state = {
-  entries: [],
-  currentReadId: null,
-  syncStatus: "idle",
-  lastSyncedAt: null
-};
-
-/* ---------- date formatting ---------- */
-function formatDate(iso) {
-  const d = new Date(iso);
-  const now = new Date();
-  const diffMs = now - d;
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-  if (d.toDateString() === now.toDateString()) return "today";
-  
-  const yest = new Date(now); yest.setDate(now.getDate() - 1);
-  if (d.toDateString() === yest.toDateString()) return "yesterday";
-
-  if (diffDays < 7) return d.toLocaleDateString(undefined, { weekday: "long" }).toLowerCase();
-  if (diffDays < 14) return "last " + d.toLocaleDateString(undefined, { weekday: "long" }).toLowerCase();
-  if (diffDays < 35) {
-    const weeks = Math.floor(diffDays / 7);
-    return weeks === 1 ? "a week ago" : weeks + " weeks ago";
-  }
-  if (d.getFullYear() === now.getFullYear()) return d.toLocaleDateString(undefined, { month: "long", day: "numeric" }).toLowerCase();
-  
-  return d.toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" }).toLowerCase();
-}
-
-/* ---------- rendering feed ---------- */
-const scrollEl = document.getElementById("scroll");
-
-function render() {
-  state.entries.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
-  const s = loadSettings();
-  const todayStr = new Date().toLocaleDateString();
-  const canSwap = s.lastPromptSwapDate !== todayStr;
-
-  let html = '<div class="snap-item is-prompt" id="daily-prompt" ' + (canSwap ? 'style="cursor: pointer;"' : '') + '>';
-  html += '<p class="prompt-text">' + escapeHtml(getCurrentPrompt()) + '</p>';
-  html += '</div>';
-
-  if (state.entries.length === 0) {
-    html += '<div class="snap-item is-prompt"><p class="empty-state">tap + to add your first memory</p></div>';
-  } else {
-    for (const entry of state.entries) {
-      html += '<div class="snap-item" data-id="' + entry.id + '">' +
-              '<p class="entry-date">' + escapeHtml(formatDate(entry.created_at)) + '</p>' +
-              '<p class="entry-text">' + escapeHtml(entry.text) + '</p>' +
-              '</div>';
-    }
-  }
-
-  scrollEl.innerHTML = html;
-
-  const promptEl = scrollEl.querySelector("#daily-prompt");
-  if (promptEl && canSwap) {
-    promptEl.addEventListener("click", handlePromptSwap);
-  }
-
-  scrollEl.querySelectorAll(".snap-item[data-id]").forEach(el => {
-    el.addEventListener("click", () => openRead(el.dataset.id));
-  });
-
-  updateFocus();
-  updateArchiveStats();
-}
-
-function escapeHtml(s) {
-  return String(s)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
-/* ---------- focus fade on scroll ---------- */
-function updateFocus() {
-  const items = scrollEl.querySelectorAll(".snap-item");
-  const rect = scrollEl.getBoundingClientRect();
-  const center = rect.top + rect.height / 2;
-  const maxDist = rect.height / 1.2;
-
-  items.forEach(item => {
-    const r = item.getBoundingClientRect();
-    const itemCenter = r.top + r.height / 2;
-    const dist = Math.abs(center - itemCenter);
-    const proximity = Math.max(0, 1 - dist / maxDist);
-    const opacity = 0.25 + proximity * 0.75;
-    item.style.opacity = opacity.toFixed(2);
-  });
-}
-scrollEl.addEventListener("scroll", updateFocus, { passive: true });
-
-/* ---------- compose flow ---------- */
-const composeInput = document.getElementById("compose-input");
-
-function openCompose() {
-  showView("view-compose");
-  composeInput.value = "";
-  // Synchronous focus call triggered directly from tap. Keyboard opens natively!
-  composeInput.focus({ preventScroll: true }); 
-}
-
-function closeCompose() {
-  composeInput.blur();
-  showView("view-feed");
-}
-
-async function saveCompose() {
-  const text = composeInput.value.trim();
-  if (!text) {
-    closeCompose();
-    return;
-  }
-  const now = new Date().toISOString();
-  const entry = {
-    id: crypto.randomUUID(),
-    text: text,
-    created_at: now,
-    updated_at: now
-  };
-  state.entries.push(entry);
-  await dbPut(entry);
-  render();
-  closeCompose();
-  schedulePush();
-}
-
-document.getElementById("add-btn").addEventListener("click", openCompose);
-document.getElementById("compose-done").addEventListener("click", saveCompose);
-document.getElementById("compose-cancel").addEventListener("click", closeCompose);
-
-/* ---------- read / edit flow ---------- */
-const readBody = document.getElementById("read-body");
-const readMenu = document.getElementById("read-menu");
-
-function openRead(id) {
-  const entry = state.entries.find(e => e.id === id);
-  if (!entry) return;
-  state.currentReadId = id;
-  readBody.innerHTML =
-    '<p class="read-date">' + escapeHtml(formatDate(entry.created_at)) + '</p>' +
-    '<p class="read-text" id="read-text">' + escapeHtml(entry.text) + '</p>';
-  document.getElementById("read-text").addEventListener("click", enterEditMode);
-  showView("view-read");
-}
-
-function closeRead() {
-  readMenu.classList.remove("is-open");
-  state.currentReadId = null;
-  showView("view-feed");
-}
-
-function enterEditMode() {
-  const entry = state.entries.find(e => e.id === state.currentReadId);
-  if (!entry) return;
-  const lowercase = document.body.classList.contains("lowercase-mode") ? 'autocapitalize="none"' : '';
-  
-  readBody.innerHTML =
-    '<p class="read-date">' + escapeHtml(formatDate(entry.created_at)) + '</p>' +
-    '<textarea class="read-textarea" id="read-edit" ' + lowercase + ' enterkeyhint="enter">' + escapeHtml(entry.text) + '</textarea>';
-  
-  const ta = document.getElementById("read-edit");
-  ta.focus({ preventScroll: true });
-  ta.setSelectionRange(ta.value.length, ta.value.length);
-}
-
-async function saveReadEdit() {
-  const ta = document.getElementById("read-edit");
-  if (!ta) return;
-  const entry = state.entries.find(e => e.id === state.currentReadId);
-  if (!entry) return;
-  const newText = ta.value.trim();
-  if (!newText) {
-    await deleteCurrentEntry();
-    return;
-  }
-  if (newText !== entry.text) {
-    entry.text = newText;
-    entry.updated_at = new Date().toISOString();
-    await dbPut(entry);
-    render();
-    schedulePush();
-  }
-  closeRead();
-}
-
-async function deleteCurrentEntry() {
-  const id = state.currentReadId;
-  if (!id) return;
-  state.entries = state.entries.filter(e => e.id !== id);
-  await dbDelete(id);
-  render();
-  closeRead();
-  schedulePush();
-}
-
-document.getElementById("read-close").addEventListener("click", () => {
-  if (document.getElementById("read-edit")) {
-    saveReadEdit();
-  } else {
-    closeRead();
-  }
-});
-
-document.getElementById("read-menu-btn").addEventListener("click", (e) => {
-  e.stopPropagation();
-  readMenu.classList.toggle("is-open");
-});
-document.addEventListener("click", (e) => {
-  if (!readMenu.contains(e.target) && e.target.id !== "read-menu-btn") {
-    readMenu.classList.remove("is-open");
-  }
-});
-
-document.getElementById("menu-edit").addEventListener("click", () => {
-  readMenu.classList.remove("is-open");
-  enterEditMode();
-});
-
-document.getElementById("menu-delete").addEventListener("click", () => {
-  readMenu.classList.remove("is-open");
-  document.getElementById("confirm-backdrop").classList.add("is-open");
-});
-
-document.getElementById("confirm-cancel").addEventListener("click", () => {
-  document.getElementById("confirm-backdrop").classList.remove("is-open");
-});
-document.getElementById("confirm-delete").addEventListener("click", async () => {
-  document.getElementById("confirm-backdrop").classList.remove("is-open");
-  await deleteCurrentEntry();
-});
-
-/* ---------- shuffle ---------- */
-document.getElementById("shuffle-btn").addEventListener("click", () => {
-  if (state.entries.length === 0) return;
-  const items = scrollEl.querySelectorAll(".snap-item[data-id]");
-  if (items.length === 0) return;
-  const idx = Math.floor(Math.random() * items.length);
-  items[idx].scrollIntoView({ behavior: "smooth", block: "center" });
-});
-
-/* ---------- settings ---------- */
-function openSettings() {
-  const s = loadSettings();
-  document.getElementById("gist-id-input").value = s.gistId || "";
-  document.getElementById("token-input").value = s.token || "";
-  setActiveTheme(s.theme || "auto");
-  updateSyncStatusText();
-  updateArchiveStats();
-  showView("view-settings");
-}
-function closeSettings() {
-  showView("view-feed");
-}
-document.getElementById("settings-trigger").addEventListener("click", openSettings);
-document.getElementById("settings-close").addEventListener("click", closeSettings);
-
-document.getElementById("save-sync-btn").addEventListener("click", () => {
-  const s = loadSettings();
-  s.gistId = document.getElementById("gist-id-input").value.trim();
-  s.token = document.getElementById("token-input").value.trim();
-  saveSettings(s);
-  updateSyncStatusText();
-  flashButton("save-sync-btn", "saved");
-});
-
-function flashButton(id, msg) {
-  const btn = document.getElementById(id);
-  const original = btn.textContent;
-  btn.textContent = msg;
-  setTimeout(() => { btn.textContent = original; }, 1200);
-}
-
-/* theme */
-function setActiveTheme(theme) {
-  document.documentElement.setAttribute("data-theme", theme);
-  document.querySelectorAll(".theme-option").forEach(opt => {
-    opt.classList.toggle("is-active", opt.dataset.themeValue === theme);
-  });
-  const s = loadSettings();
-  s.theme = theme;
-  saveSettings(s);
-}
-document.querySelectorAll(".theme-option").forEach(opt => {
-  opt.addEventListener("click", () => setActiveTheme(opt.dataset.themeValue));
-});
-
-/* lowercase mode */
-function setLowercaseMode(enabled) {
-  document.body.classList.toggle("lowercase-mode", enabled);
-  const composeInput = document.getElementById("compose-input");
-  if (composeInput) {
-    composeInput.setAttribute("autocapitalize", enabled ? "none" : "sentences");
-  }
-  const toggle = document.getElementById("lowercase-toggle");
-  if (toggle) toggle.checked = enabled;
-  const s = loadSettings();
-  s.lowercase = enabled;
-  saveSettings(s);
-}
-document.getElementById("lowercase-toggle").addEventListener("change", (e) => {
-  setLowercaseMode(e.target.checked);
-});
-
-/* archive stats */
-function updateArchiveStats() {
-  const el = document.getElementById("archive-stats");
-  if (!el) return;
-  const n = state.entries.length;
-  if (n === 0) {
-    el.textContent = "no entries yet";
-    return;
-  }
-  const oldest = state.entries[state.entries.length - 1];
-  const d = new Date(oldest.created_at);
-  const monthYear = d.toLocaleDateString(undefined, { month: "long", year: "numeric" }).toLowerCase();
-  el.textContent = n + (n === 1 ? " entry" : " entries") + " since " + monthYear;
-}
-
-/* ---------- export / import ---------- */
-function exportData() {
-  const data = {
-    version: 1,
-    entries: state.entries,
-    exported_at: new Date().toISOString()
-  };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "shoebox-" + new Date().toISOString().split("T")[0] + ".json";
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-document.getElementById("export-btn").addEventListener("click", exportData);
-
-document.getElementById("import-btn").addEventListener("click", () => {
-  document.getElementById("import-file").click();
-});
-
-document.getElementById("import-file").addEventListener("change", async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  try {
-    const text = await file.text();
-    const data = JSON.parse(text);
-    if (!data.entries || !Array.isArray(data.entries)) {
-      alert("invalid file format");
-      return;
-    }
-    const merged = mergeEntries(state.entries, data.entries);
-    state.entries = merged;
-    for (const entry of merged) await dbPut(entry);
-    render();
-    schedulePush();
-    flashImport();
-  } catch (err) {
-    alert("could not import: " + err.message);
-  }
-  e.target.value = "";
-});
-
-function flashImport() {
-  const el = document.querySelector("#import-btn .settings-data-label");
-  const original = el.textContent;
-  el.textContent = "imported";
-  setTimeout(() => { el.textContent = original; }, 1500);
-}
-
-function mergeEntries(localList, remoteList) {
-  const map = new Map();
-  for (const e of localList) map.set(e.id, e);
-  for (const e of remoteList) {
-    const existing = map.get(e.id);
-    if (!existing) {
-      map.set(e.id, e);
-    } else {
-      const localTime = new Date(existing.updated_at || existing.created_at).getTime();
-      const remoteTime = new Date(e.updated_at || e.created_at).getTime();
-      if (remoteTime > localTime) map.set(e.id, e);
-    }
-  }
-  return Array.from(map.values());
-}
-
-/* ---------- gist sync ---------- */
-const GIST_FILENAME = "shoebox.json";
-
-async function gistFetch(gistId, token) {
-  const res = await fetch("https://api.github.com/gists/" + gistId, {
-    headers: { "Authorization": "Bearer " + token, "Accept": "application/vnd.github+json" }
-  });
-  if (!res.ok) throw new Error("fetch failed: " + res.status);
-  const data = await res.json();
-  const file = data.files[GIST_FILENAME];
-  if (!file) return { version: 1, entries: [] };
-  let content = file.content;
-  if (file.truncated && file.raw_url) {
-    const r = await fetch(file.raw_url);
-    content = await r.text();
-  }
-  try { return JSON.parse(content); } 
-  catch { return { version: 1, entries: [] }; }
-}
-
-async function gistPush(gistId, token, payload) {
-  const body = {
-    files: {
-      [GIST_FILENAME]: { content: JSON.stringify(payload, null, 2) }
-    }
-  };
-  const res = await fetch("https://api.github.com/gists/" + gistId, {
-    method: "PATCH",
-    headers: {
-      "Authorization": "Bearer " + token,
-      "Accept": "application/vnd.github+json",
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(body)
-  });
-  if (!res.ok) throw new Error("push failed: " + res.status);
-}
-
-async function gistCreate(token) {
-  const body = {
-    description: "shoebox memories",
-    public: false,
-    files: {
-      [GIST_FILENAME]: { content: JSON.stringify({ version: 1, entries: [] }, null, 2) }
-    }
-  };
-  const res = await fetch("https://api.github.com/gists", {
-    method: "POST",
-    headers: {
-      "Authorization": "Bearer " + token,
-      "Accept": "application/vnd.github+json",
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(body)
-  });
-  if (!res.ok) throw new Error("create failed: " + res.status);
-  const data = await res.json();
-  return data.id;
-}
-
-async function syncPull() {
-  const s = loadSettings();
-  if (!s.gistId || !s.token) return;
-  state.syncStatus = "syncing";
-  updateSyncStatusText();
-  try {
-    const remote = await gistFetch(s.gistId, s.token);
-    const merged = mergeEntries(state.entries, remote.entries || []);
-    const changed = merged.length !== state.entries.length ||
-      merged.some(m => {
-        const local = state.entries.find(e => e.id === m.id);
-        return !local || local.updated_at !== m.updated_at;
-      });
-    if (changed) {
-      state.entries = merged;
-      for (const e of merged) await dbPut(e);
-      render();
-    }
-    state.syncStatus = "synced";
-    state.lastSyncedAt = new Date().toISOString();
-    s.lastSyncedAt = state.lastSyncedAt;
-    saveSettings(s);
-  } catch (err) {
-    state.syncStatus = "error";
-    console.warn("pull failed:", err);
-  }
-  updateSyncStatusText();
-}
-
-async function syncPush() {
-  const s = loadSettings();
-  if (!s.gistId || !s.token) return;
-  state.syncStatus = "syncing";
-  updateSyncStatusText();
-  try {
-    const remote = await gistFetch(s.gistId, s.token);
-    const merged = mergeEntries(state.entries, remote.entries || []);
-    state.entries = merged;
-    for (const e of merged) await dbPut(e);
-    await gistPush(s.gistId, s.token, { version: 1, entries: merged });
-    render();
-    state.syncStatus = "synced";
-    state.lastSyncedAt = new Date().toISOString();
-    s.lastSyncedAt = state.lastSyncedAt;
-    saveSettings(s);
-  } catch (err) {
-    state.syncStatus = "error";
-    console.warn("push failed:", err);
-  }
-  updateSyncStatusText();
-}
-
-let pushTimer = null;
-function schedulePush() {
-  const s = loadSettings();
-  if (!s.gistId || !s.token) return;
-  if (pushTimer) clearTimeout(pushTimer);
-  pushTimer = setTimeout(syncPush, 2000);
-}
-
-function updateSyncStatusText() {
-  const el = document.getElementById("sync-status");
-  if (!el) return;
-  const s = loadSettings();
-  if (!s.gistId || !s.token) {
-    el.textContent = "not configured";
-    return;
-  }
-  if (state.syncStatus === "syncing") {
-    el.textContent = "syncing…";
-    return;
-  }
-  if (state.syncStatus === "error") {
-    el.textContent = "sync failed";
-    return;
-  }
-  const last = state.lastSyncedAt || s.lastSyncedAt;
-  if (last) {
-    el.textContent = "last synced " + relativeTime(last);
-  } else {
-    el.textContent = "ready to sync";
-  }
-}
-
-function relativeTime(iso) {
-  const diff = Date.now() - new Date(iso).getTime();
-  const min = Math.floor(diff / 60000);
-  if (min < 1) return "just now";
-  if (min < 60) return min + (min === 1 ? " minute ago" : " minutes ago");
-  const hr = Math.floor(min / 60);
-  if (hr < 24) return hr + (hr === 1 ? " hour ago" : " hours ago");
-  const d = Math.floor(hr / 24);
-  return d + (d === 1 ? " day ago" : " days ago");
-}
-
-document.getElementById("sync-now-btn").addEventListener("click", syncPush);
-
-document.getElementById("create-gist-btn").addEventListener("click", async () => {
-  const token = document.getElementById("token-input").value.trim();
-  if (!token) {
-    alert("enter a github token first");
-    return;
-  }
-  flashButton("create-gist-btn", "creating…");
-  try {
-    const id = await gistCreate(token);
-    document.getElementById("gist-id-input").value = id;
-    const s = loadSettings();
-    s.gistId = id;
-    s.token = token;
-    saveSettings(s);
-    updateSyncStatusText();
-    flashButton("create-gist-btn", "created");
-  } catch (err) {
-    flashButton("create-gist-btn", "failed");
-  }
-});
-
-/* ---------- service worker ---------- */
-if ("serviceWorker" in navigator) {
-  const swCode = `
-    const CACHE = "shoebox-v1";
-    self.addEventListener("install", e => { self.skipWaiting(); });
-    self.addEventListener("activate", e => { e.waitUntil(self.clients.claim()); });
-    self.addEventListener("fetch", e => {
-      if (e.request.method !== "GET") return;
-      e.respondWith(
-        caches.match(e.request).then(cached => {
-          return cached || fetch(e.request).then(res => {
-            if (res.ok && e.request.url.startsWith(self.location.origin)) {
-              const clone = res.clone();
-              caches.open(CACHE).then(c => c.put(e.request, clone));
+    <script>
+        const viewIdle = document.getElementById('view-idle');
+        const viewActive = document.getElementById('view-active');
+        const archiveList = document.getElementById('archive');
+        const activeStack = document.getElementById('active-stack');
+        const timeInput = document.getElementById('time-input');
+        const streamInput = document.getElementById('stream-input');
+        const timerDisplay = document.getElementById('timer');
+        const btnStart = document.getElementById('btn-start');
+        const btnEnd = document.getElementById('btn-end');
+        const btnClear = document.getElementById('btn-clear');
+        const btnBurn = document.getElementById('btn-burn');
+
+        const FADE_START_MS = 2500; 
+        const FADE_DURATION_MS = 2500; 
+        const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+        
+        let logs = [];
+        let sessionLogs = []; 
+        let sessionTimer = null;
+        let fadeLoop = null;
+        let sessionEndTime = 0;
+        let isInfinite = false;
+        let isBurnMode = false;
+        let lastTypeTime = 0;
+        let isTyping = false;
+
+        // --- Initialization & Auto-Purge ---
+        function initData() {
+            const rawData = localStorage.getItem('stream_data_final');
+            if (rawData) {
+                const parsed = JSON.parse(rawData);
+                const now = Date.now();
+                logs = parsed.filter(log => (now - new Date(log.timestamp).getTime()) < ONE_DAY_MS);
+                
+                if (logs.length !== parsed.length) {
+                    localStorage.setItem('stream_data_final', JSON.stringify(logs));
+                }
             }
-            return res;
-          }).catch(() => cached);
-        })
-      );
-    });
-  `;
-  const blob = new Blob([swCode], { type: "application/javascript" });
-  const swUrl = URL.createObjectURL(blob);
-  navigator.serviceWorker.register(swUrl).catch(() => {});
-}
+        }
 
-/* ---------- init ---------- */
-async function init() {
-  const s = loadSettings();
-  setActiveTheme(s.theme || "auto");
-  setLowercaseMode(s.lowercase !== false);
+        function formatRelativeTime(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffDays = Math.floor((now - date) / ONE_DAY_MS);
+            const timeStr = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 
-  try {
-    state.entries = await dbAll();
-  } catch (err) {
-    console.error("db load failed:", err);
-    state.entries = [];
-  }
+            if (diffDays === 0 && now.getDate() === date.getDate()) return `Today at ${timeStr}`;
+            if (diffDays === 1 || (diffDays === 0 && now.getDate() !== date.getDate())) return `Yesterday at ${timeStr}`;
+            return `${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} at ${timeStr}`;
+        }
 
-  if (s.lastSyncedAt) state.lastSyncedAt = s.lastSyncedAt;
+        function formatCountdown(seconds) {
+            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const s = (seconds % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
 
-  render();
+        function renderArchive() {
+            archiveList.innerHTML = '';
+            if (logs.length === 0) {
+                archiveList.innerHTML = `
+                    <div class="empty-state">
+                        <p>No thoughts captured.</p>
+                        <p class="subtext">Logs auto-purge after 24 hours.</p>
+                    </div>`;
+                return;
+            }
 
-  if (s.gistId && s.token) {
-    syncPull();
-  }
-}
+            logs.forEach(log => {
+                const el = document.createElement('div');
+                el.className = 'log-entry';
+                el.innerHTML = `
+                    <div class="log-time">${formatRelativeTime(log.timestamp)}</div>
+                    <div class="log-text">${log.text}</div>
+                `;
+                archiveList.appendChild(el);
+            });
+            setTimeout(() => { archiveList.scrollTop = archiveList.scrollHeight; }, 10);
+        }
 
-init();
+        // --- Session Logic ---
+        function toggleBurnMode() {
+            isBurnMode = !isBurnMode;
+            if (isBurnMode) {
+                btnBurn.classList.add('active');
+                btnBurn.textContent = 'Burn';
+            } else {
+                btnBurn.classList.remove('active');
+                btnBurn.textContent = 'Save';
+            }
+        }
 
-window.addEventListener("resize", updateFocus);
+        function startSession() {
+            const val = timeInput.value.trim();
+            let mins = parseInt(val);
+            
+            isInfinite = (!val || isNaN(mins) || mins <= 0);
 
-let lastTouch = 0;
-document.addEventListener("touchend", (e) => {
-  const now = Date.now();
-  if (now - lastTouch < 300) e.preventDefault();
-  lastTouch = now;
-}, { passive: false });
+            viewIdle.classList.remove('active');
+            viewActive.classList.add('active');
+            activeStack.innerHTML = ''; 
+            sessionLogs = []; 
 
-</script>
+            if (isInfinite) {
+                timerDisplay.textContent = '∞';
+                timerDisplay.style.color = 'var(--text-main)';
+            } else {
+                sessionEndTime = Date.now() + (mins * 60 * 1000);
+                updateTimerUI(mins * 60);
+                sessionTimer = setInterval(tickSession, 1000);
+            }
+            
+            streamInput.value = '';
+            streamInput.style.opacity = 1;
+            streamInput.style.height = 'auto';
+            isTyping = false;
+            
+            setTimeout(() => streamInput.focus(), 50);
+        }
+
+        function endSession() {
+            if (sessionTimer) {
+                clearInterval(sessionTimer);
+                sessionTimer = null;
+            }
+            cancelAnimationFrame(fadeLoop);
+            
+            commitThought(); 
+
+            // Burn Mode
+            if (!isBurnMode && sessionLogs.length > 0) {
+                logs = logs.concat(sessionLogs);
+                localStorage.setItem('stream_data_final', JSON.stringify(logs));
+            }
+
+            viewActive.classList.remove('active');
+            viewIdle.classList.add('active');
+            renderArchive();
+        }
+
+        function tickSession() {
+            if (isInfinite) return;
+            const remaining = Math.max(0, Math.ceil((sessionEndTime - Date.now()) / 1000));
+            updateTimerUI(remaining);
+            if (remaining <= 0) endSession();
+        }
+
+        function updateTimerUI(remaining) {
+            timerDisplay.textContent = formatCountdown(remaining);
+            if (remaining <= 10) {
+                timerDisplay.style.color = 'var(--danger)';
+            } else {
+                timerDisplay.style.color = 'var(--text-main)';
+            }
+        }
+
+        // --- Typing & Fading Logic ---
+        function handleType() {
+            isTyping = true;
+            lastTypeTime = Date.now();
+            streamInput.style.opacity = 1;
+            
+            streamInput.style.height = 'auto';
+            streamInput.style.height = Math.min(streamInput.scrollHeight, window.innerHeight * 0.3) + 'px';
+
+            if (!fadeLoop) checkFade();
+        }
+
+        function checkFade() {
+            if (!isTyping || streamInput.value.trim() === '') {
+                fadeLoop = null;
+                return;
+            }
+
+            const elapsed = Date.now() - lastTypeTime;
+
+            if (elapsed > FADE_START_MS) {
+                const fadeProgress = (elapsed - FADE_START_MS) / FADE_DURATION_MS;
+                
+                if (fadeProgress >= 1) {
+                    streamInput.value = '';
+                    streamInput.style.opacity = 1;
+                    streamInput.style.height = 'auto';
+                    isTyping = false;
+                    fadeLoop = null;
+                    return;
+                } else {
+                    streamInput.style.opacity = 1 - Math.pow(fadeProgress, 2);
+                }
+            } else {
+                streamInput.style.opacity = 1;
+            }
+            fadeLoop = requestAnimationFrame(checkFade);
+        }
+
+        function commitThought() {
+            const text = streamInput.value.trim();
+            if (text) {
+                const newLog = { text: text, timestamp: new Date().toISOString() };
+                sessionLogs.push(newLog);
+                
+                const el = document.createElement('div');
+                el.className = 'stack-item';
+                el.textContent = text;
+                activeStack.appendChild(el);
+                activeStack.scrollTop = activeStack.scrollHeight;
+            }
+            streamInput.value = '';
+            streamInput.style.opacity = 1;
+            streamInput.style.height = 'auto';
+            isTyping = false;
+        }
+
+        // --- Event Listeners ---
+        btnBurn.addEventListener('click', toggleBurnMode);
+        btnStart.addEventListener('click', startSession);
+        btnEnd.addEventListener('click', endSession);
+
+        streamInput.addEventListener('beforeinput', (e) => {
+            if (e.inputType.includes('delete')) {
+                e.preventDefault();
+                handleType();
+            }
+        });
+
+        streamInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' || e.key === 'Delete') e.preventDefault();
+            if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) e.preventDefault();
+            
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                commitThought();
+            }
+        });
+
+        streamInput.addEventListener('input', handleType);
+
+        btnClear.addEventListener('click', () => {
+            if(confirm('Clear all stored thoughts?')) {
+                logs = [];
+                localStorage.removeItem('stream_data_final');
+                renderArchive();
+            }
+        });
+
+        document.getElementById('view-active').addEventListener('click', (e) => {
+            if (e.target.tagName !== 'BUTTON') {
+                streamInput.focus();
+            }
+        });
+
+        // Boot
+        initData();
+        renderArchive();
+    </script>
 </body>
 </html>
