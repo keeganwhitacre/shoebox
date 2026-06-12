@@ -22,332 +22,6 @@
   --serif: "Lora", "Iowan Old Style", Georgia, serif;
   --mono: "DM Mono", ui-monospace, monospace;
 }
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-
-body {
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--serif);
-  font-size: 18px;
-  line-height: 1.7;
-  -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
-}
-
-.wrap {
-  max-width: 680px;
-  margin: 0 auto;
-  padding: 0 32px;
-}
-
-/* nav */
-nav {
-  padding: 40px 0 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-}
-.nav-logo {
-  font-family: var(--serif);
-  font-size: 17px;
-  font-style: italic;
-  color: var(--ink);
-  text-decoration: none;
-}
-.nav-link {
-  font-family: var(--mono);
-  font-size: 12px;
-  font-weight: 300;
-  color: var(--ink-mid);
-  text-decoration: none;
-  letter-spacing: 0.04em;
-  transition: color 0.2s;
-}
-.nav-link:hover { color: var(--ink); }
-
-/* hero */
-.hero { padding: 96px 0 80px; }
-
-.hero-eyebrow {
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 300;
-  letter-spacing: 0.12em;
-  color: var(--ink-faint);
-  margin-bottom: 28px;
-}
-
-.hero-headline {
-  font-size: clamp(34px, 5.5vw, 54px);
-  font-weight: 400;
-  line-height: 1.22;
-  letter-spacing: -0.02em;
-  color: var(--ink);
-  max-width: 560px;
-}
-.hero-headline em { font-style: italic; color: var(--ink-mid); }
-
-.hero-sub {
-  margin-top: 32px;
-  font-size: 17px;
-  line-height: 1.8;
-  color: var(--ink-mid);
-  max-width: 500px;
-}
-
-.hero-cta {
-  margin-top: 52px;
-  display: flex;
-  align-items: center;
-  gap: 28px;
-  flex-wrap: wrap;
-}
-
-.btn-primary {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--ink);
-  color: var(--paper);
-  font-family: var(--mono);
-  font-size: 13px;
-  font-weight: 300;
-  letter-spacing: 0.04em;
-  padding: 14px 28px;
-  border-radius: 3px;
-  text-decoration: none;
-  transition: opacity 0.15s;
-}
-.btn-primary:hover { opacity: 0.82; }
-
-.cta-note {
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 300;
-  color: var(--ink-faint);
-  letter-spacing: 0.04em;
-}
-
-.ruled { border: none; border-top: 0.5px solid var(--line); margin: 0; }
-
-/* screenshot */
-/*
-  TO ADD YOUR SCREENSHOT:
-  1. Place your PNG (from Xcode simulator or a real device) in the same
-     directory as this file and name it screenshot.png.
-  2. That's it. The onerror fallback will hide the placeholder automatically.
-
-  Any resolution works — the shell scales proportionally to 260px wide.
-  No need to composite the phone border yourself; CSS handles it.
-*/
-.screenshot-section {
-  padding: 72px 0;
-  display: flex;
-  justify-content: center;
-}
-
-.phone-shell {
-  width: 260px;
-  border: 1.5px solid rgba(0,0,0,0.14);
-  border-radius: 40px;
-  overflow: hidden;
-  box-shadow:
-    0 2px 4px rgba(0,0,0,0.04),
-    0 8px 28px rgba(0,0,0,0.09),
-    0 28px 72px rgba(0,0,0,0.07);
-  background: #f0ede6;
-}
-
-.phone-shell img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-.phone-shell img.hidden { display: none; }
-
-.phone-shell .placeholder {
-  width: 100%;
-  aspect-ratio: 9 / 19.5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.phone-shell .placeholder p {
-  font-family: var(--mono);
-  font-size: 10px;
-  font-weight: 300;
-  color: var(--ink-faint);
-  letter-spacing: 0.06em;
-  text-align: center;
-  line-height: 1.8;
-}
-
-/* the idea */
-.idea-section { padding: 64px 0; }
-
-.idea-section p {
-  font-size: 19px;
-  line-height: 1.8;
-  color: var(--ink-mid);
-  max-width: 560px;
-}
-.idea-section p + p { margin-top: 22px; }
-.idea-section strong {
-  font-weight: 500;
-  font-style: italic;
-  color: var(--ink);
-}
-
-/* prompts */
-.prompts-section { padding: 56px 0 72px; }
-
-.section-label {
-  font-family: var(--mono);
-  font-size: 10px;
-  font-weight: 300;
-  letter-spacing: 0.1em;
-  color: var(--ink-faint);
-  margin-bottom: 28px;
-}
-
-.prompts-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  border-top: 0.5px solid var(--line);
-}
-
-.prompt-cell {
-  padding: 18px 0;
-  border-bottom: 0.5px solid var(--line);
-  font-style: italic;
-  font-size: 15.5px;
-  color: var(--ink-mid);
-  line-height: 1.5;
-}
-.prompt-cell:nth-child(odd)  { padding-right: 24px; border-right: 0.5px solid var(--line); }
-.prompt-cell:nth-child(even) { padding-left: 24px; }
-
-/* features */
-.features-section { padding: 56px 0 72px; }
-
-.features-list {
-  border-top: 0.5px solid var(--line);
-  margin-top: 28px;
-}
-
-.feature-row {
-  display: flex;
-  align-items: baseline;
-  gap: 24px;
-  padding: 22px 0;
-  border-bottom: 0.5px solid var(--line);
-}
-
-.feature-num {
-  font-family: var(--mono);
-  font-size: 10px;
-  font-weight: 300;
-  color: var(--ink-faint);
-  letter-spacing: 0.06em;
-  flex-shrink: 0;
-  width: 24px;
-}
-
-.feature-title {
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--ink);
-  margin-bottom: 3px;
-}
-
-.feature-desc {
-  font-size: 14px;
-  color: var(--ink-mid);
-  line-height: 1.65;
-  font-style: italic;
-}
-
-/* pull quote */
-.pullquote-section {
-  padding: 80px 0;
-  text-align: center;
-}
-
-.pullquote {
-  font-size: clamp(20px, 3.8vw, 30px);
-  font-style: italic;
-  font-weight: 400;
-  line-height: 1.48;
-  color: var(--ink-mid);
-  max-width: 520px;
-  margin: 0 auto;
-  letter-spacing: -0.01em;
-}
-
-/* footer */
-footer {
-  border-top: 0.5px solid var(--line);
-  padding: 40px 0 56px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-.footer-logo {
-  font-family: var(--serif);
-  font-style: italic;
-  font-size: 15px;
-  color: var(--ink-faint);
-}
-.footer-links { display: flex; gap: 24px; }
-.footer-link {
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 300;
-  color: var(--ink-faint);
-  text-decoration: none;
-  letter-spacing: 0.04em;
-  transition: color 0.2s;
-}
-.footer-link:hover { color: var(--ink); }
-
-/* grain overlay */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9999;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-  background-size: 200px 200px;
-  opacity: 0.55;
-  mix-blend-mode: multiply;
-}
-
-/* animations */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.hero-eyebrow  { animation: fadeUp 0.6s ease both; animation-delay: 0.10s; }
-.hero-headline { animation: fadeUp 0.6s ease both; animation-delay: 0.20s; }
-.hero-sub      { animation: fadeUp 0.6s ease both; animation-delay: 0.32s; }
-.hero-cta      { animation: fadeUp 0.6s ease both; animation-delay: 0.44s; }
-
-/* responsive */
-@media (max-width: 560px) {
-  .wrap { padding: 0 22px; }
-  nav { padding-top: 28px; }
-  .hero { padding: 68px 0 56px; }
-  .prompts-grid { grid-template-columns: 1fr; }
-  .prompt-cell:nth-child(odd)  { padding-right: 0; border-right: none; }
-  .prompt-cell:nth-child(even) { padding-left: 0; }
-  footer { flex-direction: column; align-items: flex-start; }
-}
-
 </style>
 </head>
 <body>
@@ -360,14 +34,7 @@ body::after {
   </nav>
 
   <section class="hero">
-    <p class="hero-eyebrow">for iOS — free</p>
-    <h1 class="hero-headline">The small moments you'd <em>otherwise forget.</em></h1>
-    <p class="hero-sub">
-      The stranger who held the door. The way your friend laughed at that one thing.
-      The offhand remark someone made that stuck with you all day.
-      shoebox is a quiet archive for the micro-interactions that make up a life —
-      the ones that slip away before you ever think to write them down.
-    </p>
+    
     <div class="hero-cta">
       <a class="btn-primary" href="https://apps.apple.com/app/id-YOURAPPID" target="_blank">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -375,20 +42,8 @@ body::after {
         </svg>
         download on the app store
       </a>
+      <hr class="ruled">
       <span class="cta-note">no account · no tracking · no ads</span>
-    </div>
-  </section>
-
-  <hr class="ruled">
-
-  <section class="screenshot-section">
-    <div class="phone-shell">
-      <!-- Replace screenshot.png with your actual file. Remove the placeholder div when done. -->
-      <img src="screenshot.png" alt="shoebox app screenshot"
-           onerror="this.classList.add('hidden');this.nextElementSibling.style.display='flex';">
-      <div class="placeholder" style="display:none;">
-        <p>drop screenshot.png<br>in this folder</p>
-      </div>
     </div>
   </section>
 
@@ -402,7 +57,7 @@ body::after {
     </p>
     <p>
       By intentionally logging and re-reading positive moments, shoebox acts as a
-      lightweight, self-directed tool to counteract negativity bias —
+      lightweight, self-directed tool to counteract negativity bias or 
       the tendency to let the difficult days crowd out everything else.
       Or, it's just something quietly wonderful to scroll through on a slow afternoon.
     </p>
@@ -430,35 +85,36 @@ body::after {
     <p class="section-label">built to do one thing well</p>
     <div class="features-list">
       <div class="feature-row">
-        <span class="feature-num">01</span>
+      <hr class="ruled">
+       
         <div>
           <p class="feature-title">frictionless capture</p>
           <p class="feature-desc">Open the app and type. No folders, no tags, no mood trackers. The moment you open it, the keyboard is ready.</p>
         </div>
       </div>
       <div class="feature-row">
-        <span class="feature-num">02</span>
+        <hr class="ruled">
         <div>
           <p class="feature-title">rolodex-style archive</p>
-          <p class="feature-desc">A snap-scroll feed with subtle haptic feedback that encourages you to land on each memory — not mindlessly skim past it.</p>
+          <p class="feature-desc">A snap-scroll feed with subtle haptic feedback that encourages you to land on each memory, not mindlessly skim past it.</p>
         </div>
       </div>
       <div class="feature-row">
-        <span class="feature-num">03</span>
+        <hr class="ruled">
         <div>
           <p class="feature-title">daily prompts</p>
           <p class="feature-desc">Gentle nudges toward the kind of observation that's easiest to miss: a stranger, a comfortable silence, the way someone moved through a room.</p>
         </div>
       </div>
       <div class="feature-row">
-        <span class="feature-num">04</span>
+        <hr class="ruled">
         <div>
           <p class="feature-title">private by design</p>
           <p class="feature-desc">Your data lives on your device and syncs via your personal iCloud account. No corporate backend, no ads, no tracking. Deleted means gone.</p>
         </div>
       </div>
       <div class="feature-row">
-        <span class="feature-num">05</span>
+        <hr class="ruled">
         <div>
           <p class="feature-title">feature complete</p>
           <p class="feature-desc">shoebox is designed to do exactly one thing perfectly, without succumbing to feature creep. A quiet, reliable corner of your phone.</p>
@@ -467,13 +123,6 @@ body::after {
     </div>
   </section>
 
-  <hr class="ruled">
-
-  <section class="pullquote-section">
-    <p class="pullquote">
-      "It's been presumed that when good things happen, people naturally feel joy for it. But research suggests that we don't always respond to these 'good things' in ways that maximize their positive effects on our lives." - Fred Bryant
-    </p>
-  </section>
 
   <hr class="ruled">
 
